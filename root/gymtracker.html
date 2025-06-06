@@ -726,9 +726,40 @@
                 timestamp: new Date().toISOString()
             });
 
+            // Save to localStorage
             localStorage.setItem('workoutData', JSON.stringify(workouts));
 
-            alert(`Workout saved! Great job, ${currentWorkout.user}!`);
+            // Send to Google Sheets
+            const sheetData = {
+                date: currentWorkout.date,
+                user: currentWorkout.user,
+                type: currentWorkout.focuses.join(', '),
+                exercises: currentWorkout.exercises
+            };
+
+            // Replace with your Google Apps Script Web App URL
+            const GOOGLE_SHEETS_URL = 'YOUR_GOOGLE_WEB_APP_URL_HERE';
+
+            fetch(GOOGLE_SHEETS_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(sheetData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(() => {
+                alert(`Workout saved! Great job, ${currentWorkout.user}!`);
+            })
+            .catch(error => {
+                console.error('Error saving to Google Sheets:', error);
+                alert('Workout saved locally, but there was an error saving to the cloud.');
+            });
 
             // Reset form
             currentWorkout = null;
