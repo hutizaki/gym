@@ -81,7 +81,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Calendar Styles */
         .calendar-header {
             display: flex;
             justify-content: space-between;
@@ -165,12 +164,35 @@
             white-space: nowrap;
         }
 
-        .workout-users {
-            font-size: 10px;
-            margin-top: 5px;
+        .focus-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        /* Workout Tracking Styles */
+        .focus-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .focus-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .focus-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
         .workout-form {
             background: #f8f9fa;
             padding: 25px;
@@ -331,35 +353,6 @@
             font-weight: 600;
         }
 
-        .focus-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .focus-btn {
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            color: #333;
-        }
-
-        .focus-btn.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .focus-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -372,10 +365,136 @@
             
             .calendar-grid {
                 font-size: 14px;
+                gap: 5px;
+            }
+
+            .calendar-day {
+                min-height: 80px;
+                padding: 2px;
+            }
+
+            .calendar-day-header {
+                padding: 5px;
+                font-size: 12px;
+            }
+
+            .workout-tag {
+                font-size: 8px;
+                padding: 1px 4px;
             }
             
             .workout-summary {
                 flex-direction: column;
+                gap: 10px;
+            }
+
+            .summary-item {
+                width: 100%;
+                text-align: center;
+            }
+
+            .focus-buttons {
+                gap: 5px;
+            }
+
+            .focus-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .exercise-card {
+                padding: 15px;
+            }
+
+            .sets-table {
+                font-size: 12px;
+            }
+
+            .sets-table th,
+            .sets-table td {
+                padding: 5px;
+            }
+
+            .sets-table input {
+                padding: 4px;
+                font-size: 12px;
+            }
+
+            .btn {
+                padding: 8px 16px;
+                font-size: 14px;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .exercise-actions .btn {
+                width: auto;
+                margin-bottom: 0;
+            }
+
+            .calendar-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .calendar-nav {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            .workout-form {
+                padding: 15px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-control {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar-day {
+                min-height: 60px;
+            }
+
+            .workout-tags {
+                display: none;
+            }
+
+            .calendar-day.has-workout::after {
+                content: '💪';
+                position: absolute;
+                top: 2px;
+                right: 2px;
+                font-size: 12px;
+            }
+
+            .exercise-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+
+            .exercise-actions {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .exercise-actions .btn {
+                width: 100%;
             }
         }
     </style>
@@ -546,35 +665,15 @@
             return dayElement;
         }
 
-        function changeMonth(direction) {
-            currentDate.setMonth(currentDate.getMonth() + direction);
-            showCalendar();
-        }
-
-        function formatDate(year, month, day) {
-            return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        }
-
-        function showWorkoutDetails(dateStr) {
-            if (workouts[dateStr]) {
-                const workoutData = workouts[dateStr];
-                let details = `Workouts on ${dateStr}:\n\n`;
-                
-                Object.entries(workoutData).forEach(([user, userWorkouts]) => {
-                    details += `${user}:\n`;
-                    userWorkouts.forEach(workout => {
-                        details += `  • ${workout.type} (${workout.exercises.length} exercises)\n`;
-                    });
-                    details += '\n';
-                });
-                
-                alert(details);
+        function toggleFocus(button, focus) {
+            button.classList.toggle('active');
+            if (button.classList.contains('active')) {
+                selectedFocuses.add(focus);
             } else {
-                alert(`No workouts recorded for ${dateStr}`);
+                selectedFocuses.delete(focus);
             }
         }
 
-        // Workout tracking functionality
         function startWorkout() {
             const userName = document.getElementById('userName').value;
             if (selectedFocuses.size === 0) {
@@ -604,6 +703,78 @@
                 <div class="summary-item">📅 ${currentWorkout.date}</div>
                 <div class="summary-item">💪 ${currentWorkout.exercises.length} Exercises</div>
             `;
+        }
+
+        function finishWorkout() {
+            if (!currentWorkout || currentWorkout.exercises.length === 0) {
+                alert('Please add at least one exercise before finishing your workout.');
+                return;
+            }
+
+            // Save workout
+            const dateStr = currentWorkout.date;
+            if (!workouts[dateStr]) {
+                workouts[dateStr] = {};
+            }
+            if (!workouts[dateStr][currentWorkout.user]) {
+                workouts[dateStr][currentWorkout.user] = [];
+            }
+            
+            workouts[dateStr][currentWorkout.user].push({
+                focuses: currentWorkout.focuses,
+                exercises: currentWorkout.exercises,
+                timestamp: new Date().toISOString()
+            });
+
+            localStorage.setItem('workoutData', JSON.stringify(workouts));
+
+            alert(`Workout saved! Great job, ${currentWorkout.user}!`);
+
+            // Reset form
+            currentWorkout = null;
+            selectedFocuses.clear();
+            document.querySelectorAll('.focus-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('currentWorkoutSection').style.display = 'none';
+            document.getElementById('exerciseSection').style.display = 'none';
+            document.getElementById('workoutExercises').innerHTML = '';
+            
+            showCalendar(); // Refresh calendar to show new workout
+        }
+
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            showCalendar();
+        }
+
+        function formatDate(year, month, day) {
+            return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        function showWorkoutDetails(dateStr) {
+            if (workouts[dateStr]) {
+                const workoutData = workouts[dateStr];
+                let details = `Workouts on ${dateStr}:\n\n`;
+                
+                Object.entries(workoutData).forEach(([user, userWorkouts]) => {
+                    details += `${user}:\n`;
+                    userWorkouts.forEach(workout => {
+                        details += `  • ${workout.focuses.join(', ')}\n`;
+                        workout.exercises.forEach(exercise => {
+                            details += `    - ${exercise.name}\n`;
+                            exercise.sets.forEach((set, index) => {
+                                if (set.weight || set.reps) {
+                                    details += `      Set ${index + 1}: ${set.weight}lbs × ${set.reps} reps\n`;
+                                }
+                            });
+                        });
+                    });
+                    details += '\n';
+                });
+                
+                alert(details);
+            } else {
+                alert(`No workouts recorded for ${dateStr}`);
+            }
         }
 
         function addExercise() {
@@ -690,51 +861,6 @@
             updateWorkoutSummary();
         }
 
-        function finishWorkout() {
-            if (!currentWorkout || currentWorkout.exercises.length === 0) {
-                alert('Please add at least one exercise before finishing your workout.');
-                return;
-            }
-
-            // Save workout
-            const dateStr = currentWorkout.date;
-            if (!workouts[dateStr]) {
-                workouts[dateStr] = {};
-            }
-            if (!workouts[dateStr][currentWorkout.user]) {
-                workouts[dateStr][currentWorkout.user] = [];
-            }
-            
-            workouts[dateStr][currentWorkout.user].push({
-                focuses: currentWorkout.focuses,
-                exercises: currentWorkout.exercises,
-                timestamp: new Date().toISOString()
-            });
-
-            localStorage.setItem('workoutData', JSON.stringify(workouts));
-
-            alert(`Workout saved! Great job, ${currentWorkout.user}!`);
-
-            // Reset form
-            currentWorkout = null;
-            selectedFocuses.clear();
-            document.querySelectorAll('.focus-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('currentWorkoutSection').style.display = 'none';
-            document.getElementById('exerciseSection').style.display = 'none';
-            document.getElementById('workoutExercises').innerHTML = '';
-            
-            showCalendar(); // Refresh calendar to show new workout
-        }
-
-        function toggleFocus(button, focus) {
-            button.classList.toggle('active');
-            if (button.classList.contains('active')) {
-                selectedFocuses.add(focus);
-            } else {
-                selectedFocuses.delete(focus);
-            }
-        }
-
         // Page navigation
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
@@ -752,4 +878,4 @@
         showCalendar();
     </script>
 </body>
-</html>
+</html> 
