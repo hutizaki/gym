@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .page {
+            display: none;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Calendar Styles */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-nav {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-nav:hover {
+            background: #5a6fd8;
+            transform: scale(1.05);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            color: #667eea;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            position: relative;
+            padding: 5px;
+            min-height: 100px;
+        }
+
+        .calendar-day:hover {
+            border-color: #667eea;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .calendar-day.has-workout {
+            background: white;
+            border-color: #667eea;
+        }
+
+        .workout-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 5px;
+            justify-content: center;
+        }
+
+        .workout-tag {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            background: #667eea;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .workout-users {
+            font-size: 10px;
+            margin-top: 5px;
+        }
+
+        /* Workout Tracking Styles */
+        .workout-form {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .workout-exercises {
+            display: grid;
+            gap: 20px;
+        }
+
+        .exercise-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .exercise-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .exercise-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .exercise-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            flex-grow: 1;
+        }
+
+        .sets-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .sets-table th,
+        .sets-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .sets-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .sets-table input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .add-set-btn {
+            margin-top: 10px;
+            background: #28a745;
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+
+        .exercise-actions {
+            margin-left: 10px;
+        }
+
+        .current-workout {
+            background: #e8f4f8;
+            border: 2px solid #17a2b8;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .current-workout h3 {
+            color: #17a2b8;
+            margin-bottom: 15px;
+        }
+
+        .workout-summary {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .summary-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .focus-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .focus-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .focus-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .focus-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .nav {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .calendar-grid {
+                font-size: 14px;
+            }
+            
+            .workout-summary {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💪 Workout Tracker</h1>
+            <p>Track your fitness journey with friends</p>
+        </div>
+
+        <div class="nav">
+            <button class="nav-btn active" onclick="showPage('calendar')">📅 Calendar</button>
+            <button class="nav-btn" onclick="showPage('workout')">🏋️ Track Workout</button>
+        </div>
+
+        <!-- Calendar Page -->
+        <div id="calendar" class="page active">
+            <div class="calendar-header">
+                <button class="calendar-nav" onclick="changeMonth(-1)">← Previous</button>
+                <h2 id="currentMonth"></h2>
+                <button class="calendar-nav" onclick="changeMonth(1)">Next →</button>
+            </div>
+            
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- Calendar will be generated here -->
+            </div>
+
+            <div style="text-align: center; color: #666; margin-top: 20px;">
+                <p>🟣 Days with workouts | Click on a day to see workout details</p>
+            </div>
+        </div>
+
+        <!-- Workout Tracking Page -->
+        <div id="workout" class="page">
+            <div class="current-workout" id="currentWorkoutSection" style="display: none;">
+                <h3>Current Workout Session</h3>
+                <div class="workout-summary" id="workoutSummary"></div>
+                <button class="btn btn-danger" onclick="finishWorkout()">Finish Workout</button>
+            </div>
+
+            <div class="workout-form">
+                <h3>Start Your Workout</h3>
+                <div class="form-group">
+                    <label for="userName">Your Name:</label>
+                    <select id="userName" class="form-control">
+                        <option value="Bryan">Bryan</option>
+                        <option value="Riley">Riley</option>
+                        <option value="Ques">Ques</option>
+                        <option value="Ryan">Ryan</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Workout Focus:</label>
+                    <div class="focus-buttons" id="focusButtons">
+                        <button class="focus-btn" onclick="toggleFocus(this, 'Chest')">Chest</button>
+                        <button class="focus-btn" onclick="toggleFocus(this, 'Back')">Back</button>
+                        <button class="focus-btn" onclick="toggleFocus(this, 'Legs')">Legs</button>
+                        <button class="focus-btn" onclick="toggleFocus(this, 'Shoulders')">Shoulders</button>
+                        <button class="focus-btn" onclick="toggleFocus(this, 'Arms')">Arms</button>
+                        <button class="focus-btn" onclick="toggleFocus(this, 'Cardio')">Cardio</button>
+                        <button class="focus-btn" onclick="toggleFocus(this, 'Full Body')">Full Body</button>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="startWorkout()">Start Workout</button>
+            </div>
+
+            <div id="exerciseSection" style="display: none;">
+                <div class="workout-form">
+                    <h3>Add Exercise</h3>
+                    <div class="form-group">
+                        <label for="exerciseName">Exercise Name:</label>
+                        <input type="text" id="exerciseName" class="form-control" placeholder="e.g., Bench Press, Squats, Running">
+                    </div>
+                    <button class="btn" onclick="addExercise()">Add Exercise</button>
+                </div>
+
+                <div class="workout-exercises" id="workoutExercises">
+                    <!-- Exercises will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let workouts = JSON.parse(localStorage.getItem('workoutData') || '{}');
+        let currentWorkout = null;
+        let currentDate = new Date();
+        let selectedFocuses = new Set();
+
+        // Calendar functionality
+        function showCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('currentMonth').textContent = 
+                new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+
+            // Day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day-header';
+                dayElement.textContent = day;
+                calendarGrid.appendChild(dayElement);
+            });
+
+            // Previous month days
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const dayElement = createCalendarDay(daysInPrevMonth - i, true);
+                calendarGrid.appendChild(dayElement);
+            }
+
+            // Current month days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = createCalendarDay(day, false);
+                calendarGrid.appendChild(dayElement);
+            }
+
+            // Next month days
+            const totalCells = calendarGrid.children.length - 7;
+            const remainingCells = 42 - totalCells;
+            for (let day = 1; day <= remainingCells; day++) {
+                const dayElement = createCalendarDay(day, true);
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        function createCalendarDay(day, otherMonth) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            if (otherMonth) dayElement.classList.add('other-month');
+
+            const dateStr = formatDate(currentDate.getFullYear(), currentDate.getMonth(), day);
+            
+            if (workouts[dateStr]) {
+                dayElement.classList.add('has-workout');
+                const workoutTags = new Set();
+                Object.entries(workouts[dateStr]).forEach(([user, userWorkouts]) => {
+                    userWorkouts.forEach(workout => {
+                        workoutTags.add(workout.type);
+                    });
+                });
+                
+                dayElement.innerHTML = `
+                    <span>${day}</span>
+                    <div class="workout-tags">
+                        ${Array.from(workoutTags).map(type => 
+                            `<span class="workout-tag">${type}</span>`
+                        ).join('')}
+                    </div>
+                `;
+            } else {
+                dayElement.innerHTML = `<span>${day}</span>`;
+            }
+
+            dayElement.onclick = () => showWorkoutDetails(dateStr);
+            return dayElement;
+        }
+
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            showCalendar();
+        }
+
+        function formatDate(year, month, day) {
+            return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        function showWorkoutDetails(dateStr) {
+            if (workouts[dateStr]) {
+                const workoutData = workouts[dateStr];
+                let details = `Workouts on ${dateStr}:\n\n`;
+                
+                Object.entries(workoutData).forEach(([user, userWorkouts]) => {
+                    details += `${user}:\n`;
+                    userWorkouts.forEach(workout => {
+                        details += `  • ${workout.type} (${workout.exercises.length} exercises)\n`;
+                    });
+                    details += '\n';
+                });
+                
+                alert(details);
+            } else {
+                alert(`No workouts recorded for ${dateStr}`);
+            }
+        }
+
+        // Workout tracking functionality
+        function startWorkout() {
+            const userName = document.getElementById('userName').value;
+            if (selectedFocuses.size === 0) {
+                alert('Please select at least one workout focus');
+                return;
+            }
+            
+            currentWorkout = {
+                user: userName,
+                focuses: Array.from(selectedFocuses),
+                date: formatDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()),
+                exercises: []
+            };
+
+            document.getElementById('currentWorkoutSection').style.display = 'block';
+            document.getElementById('exerciseSection').style.display = 'block';
+            updateWorkoutSummary();
+        }
+
+        function updateWorkoutSummary() {
+            if (!currentWorkout) return;
+
+            const summary = document.getElementById('workoutSummary');
+            summary.innerHTML = `
+                <div class="summary-item">👤 ${currentWorkout.user}</div>
+                <div class="summary-item">🎯 ${currentWorkout.focuses.join(', ')}</div>
+                <div class="summary-item">📅 ${currentWorkout.date}</div>
+                <div class="summary-item">💪 ${currentWorkout.exercises.length} Exercises</div>
+            `;
+        }
+
+        function addExercise() {
+            const exerciseName = document.getElementById('exerciseName').value.trim();
+            if (!exerciseName) return;
+
+            const exercise = {
+                name: exerciseName,
+                sets: [{ weight: '', reps: '' }]
+            };
+
+            currentWorkout.exercises.push(exercise);
+            renderExercises();
+            updateWorkoutSummary();
+            document.getElementById('exerciseName').value = '';
+        }
+
+        function renderExercises() {
+            const container = document.getElementById('workoutExercises');
+            container.innerHTML = '';
+
+            currentWorkout.exercises.forEach((exercise, exerciseIndex) => {
+                const exerciseCard = document.createElement('div');
+                exerciseCard.className = 'exercise-card';
+                exerciseCard.innerHTML = `
+                    <div class="exercise-header">
+                        <div class="exercise-name">${exercise.name}</div>
+                        <div class="exercise-actions">
+                            <button class="btn btn-danger" onclick="removeExercise(${exerciseIndex})">Remove</button>
+                        </div>
+                    </div>
+                    <table class="sets-table">
+                        <thead>
+                            <tr>
+                                <th>Set</th>
+                                <th>Weight (lbs)</th>
+                                <th>Reps</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sets-${exerciseIndex}">
+                        </tbody>
+                    </table>
+                    <button class="btn add-set-btn" onclick="addSet(${exerciseIndex})">+ Add Set</button>
+                `;
+                container.appendChild(exerciseCard);
+                renderSets(exerciseIndex);
+            });
+        }
+
+        function renderSets(exerciseIndex) {
+            const setsContainer = document.getElementById(`sets-${exerciseIndex}`);
+            setsContainer.innerHTML = '';
+
+            currentWorkout.exercises[exerciseIndex].sets.forEach((set, setIndex) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${setIndex + 1}</td>
+                    <td><input type="number" value="${set.weight}" onchange="updateSet(${exerciseIndex}, ${setIndex}, 'weight', this.value)" placeholder="0"></td>
+                    <td><input type="number" value="${set.reps}" onchange="updateSet(${exerciseIndex}, ${setIndex}, 'reps', this.value)" placeholder="0"></td>
+                    <td><button class="btn btn-danger" onclick="removeSet(${exerciseIndex}, ${setIndex})">Remove</button></td>
+                `;
+                setsContainer.appendChild(row);
+            });
+        }
+
+        function addSet(exerciseIndex) {
+            currentWorkout.exercises[exerciseIndex].sets.push({ weight: '', reps: '' });
+            renderSets(exerciseIndex);
+        }
+
+        function removeSet(exerciseIndex, setIndex) {
+            currentWorkout.exercises[exerciseIndex].sets.splice(setIndex, 1);
+            renderSets(exerciseIndex);
+        }
+
+        function updateSet(exerciseIndex, setIndex, property, value) {
+            currentWorkout.exercises[exerciseIndex].sets[setIndex][property] = value;
+        }
+
+        function removeExercise(exerciseIndex) {
+            currentWorkout.exercises.splice(exerciseIndex, 1);
+            renderExercises();
+            updateWorkoutSummary();
+        }
+
+        function finishWorkout() {
+            if (!currentWorkout || currentWorkout.exercises.length === 0) {
+                alert('Please add at least one exercise before finishing your workout.');
+                return;
+            }
+
+            // Save workout
+            const dateStr = currentWorkout.date;
+            if (!workouts[dateStr]) {
+                workouts[dateStr] = {};
+            }
+            if (!workouts[dateStr][currentWorkout.user]) {
+                workouts[dateStr][currentWorkout.user] = [];
+            }
+            
+            workouts[dateStr][currentWorkout.user].push({
+                focuses: currentWorkout.focuses,
+                exercises: currentWorkout.exercises,
+                timestamp: new Date().toISOString()
+            });
+
+            localStorage.setItem('workoutData', JSON.stringify(workouts));
+
+            alert(`Workout saved! Great job, ${currentWorkout.user}!`);
+
+            // Reset form
+            currentWorkout = null;
+            selectedFocuses.clear();
+            document.querySelectorAll('.focus-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('currentWorkoutSection').style.display = 'none';
+            document.getElementById('exerciseSection').style.display = 'none';
+            document.getElementById('workoutExercises').innerHTML = '';
+            
+            showCalendar(); // Refresh calendar to show new workout
+        }
+
+        function toggleFocus(button, focus) {
+            button.classList.toggle('active');
+            if (button.classList.contains('active')) {
+                selectedFocuses.add(focus);
+            } else {
+                selectedFocuses.delete(focus);
+            }
+        }
+
+        // Page navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(pageId).classList.add('active');
+            event.target.classList.add('active');
+
+            if (pageId === 'calendar') {
+                showCalendar();
+            }
+        }
+
+        // Initialize app
+        showCalendar();
+    </script>
+</body>
+</html>
