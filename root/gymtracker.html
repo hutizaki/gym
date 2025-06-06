@@ -86,6 +86,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            flex-direction: row;
+            gap: 10px;
         }
 
         .calendar-nav {
@@ -97,11 +99,20 @@
             cursor: pointer;
             font-size: 16px;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .calendar-nav:hover {
             background: #5a6fd8;
             transform: scale(1.05);
+        }
+
+        #currentMonth {
+            flex-grow: 1;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
         }
 
         .calendar-grid {
@@ -134,6 +145,24 @@
             position: relative;
             padding: 5px;
             min-height: 100px;
+        }
+
+        .user-count {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #667eea;
+            color: white;
+            font-size: 10px;
+            padding: 2px 4px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .user-count span {
+            font-size: 8px;
         }
 
         .calendar-day:hover {
@@ -276,9 +305,11 @@
 
         .exercise-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
+            gap: 8px;
+            flex-wrap: nowrap;
         }
 
         .exercise-name {
@@ -286,6 +317,11 @@
             font-weight: 600;
             color: #333;
             flex-grow: 1;
+            flex-shrink: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .sets-table {
@@ -366,11 +402,16 @@
             .calendar-grid {
                 font-size: 14px;
                 gap: 5px;
+                grid-template-columns: repeat(7, 1fr);
+                width: 100%;
+                overflow-x: hidden;
             }
 
             .calendar-day {
-                min-height: 80px;
+                min-height: 60px;
                 padding: 2px;
+                aspect-ratio: 1;
+                font-size: 12px;
             }
 
             .calendar-day-header {
@@ -433,14 +474,18 @@
             }
 
             .calendar-header {
-                flex-direction: column;
-                gap: 10px;
-                text-align: center;
+                flex-direction: row;
+                gap: 5px;
+                padding: 0 5px;
             }
 
             .calendar-nav {
-                width: 100%;
-                margin: 5px 0;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+
+            #currentMonth {
+                font-size: 1.2rem;
             }
 
             .workout-form {
@@ -466,8 +511,22 @@
         }
 
         @media (max-width: 480px) {
+            .container {
+                padding: 5px;
+            }
+
+            .calendar-grid {
+                gap: 2px;
+            }
+
             .calendar-day {
-                min-height: 60px;
+                min-height: 45px;
+                font-size: 11px;
+            }
+
+            .calendar-day-header {
+                font-size: 11px;
+                padding: 3px;
             }
 
             .workout-tags {
@@ -475,11 +534,7 @@
             }
 
             .calendar-day.has-workout::after {
-                content: '💪';
-                position: absolute;
-                top: 2px;
-                right: 2px;
-                font-size: 12px;
+                display: none;
             }
 
             .exercise-header {
@@ -495,6 +550,308 @@
 
             .exercise-actions .btn {
                 width: 100%;
+            }
+
+            .page {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .header p {
+                font-size: 12px;
+            }
+
+            .calendar-header {
+                gap: 2px;
+            }
+
+            .calendar-nav {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+
+            #currentMonth {
+                font-size: 1rem;
+            }
+
+            .user-count {
+                font-size: 8px;
+                padding: 1px 3px;
+            }
+
+            .user-count span {
+                font-size: 7px;
+            }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: #333;
+            transform: scale(1.1);
+        }
+
+        .modal-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .user-list {
+            width: 200px;
+            border-right: 2px solid #e9ecef;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .user-button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .user-button:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .user-button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .workout-details {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .workout-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .workout-card h4 {
+            margin: 0 0 10px 0;
+            color: #667eea;
+        }
+
+        .workout-focus {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .exercise-list {
+            margin-top: 10px;
+        }
+
+        .exercise-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .exercise-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .set-list {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .set-item {
+            margin: 3px 0;
+        }
+
+        @media (max-width: 768px) {
+            .modal {
+                width: 95%;
+                max-height: 90vh;
+            }
+
+            .modal-content {
+                flex-direction: column;
+            }
+
+            .user-list {
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px solid #e9ecef;
+                max-height: 150px;
+            }
+
+            .user-button {
+                padding: 10px;
+                font-size: 13px;
+            }
+        }
+
+        .exercise-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .exercise-input-group .form-control {
+            flex: 1;
+            min-width: 0;
+            width: 100%;
+        }
+
+        .exercise-input-group .btn {
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        .workout-actions {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .workout-summary {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .summary-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .caret-btn {
+            background: rgba(102,126,234,0.08);
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            margin-left: 10px;
+            color: #667eea;
+            transition: color 0.2s, background 0.2s;
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            border-radius: 50%;
+            min-width: 36px;
+            min-height: 36px;
+            justify-content: center;
+        }
+
+        .caret-btn:hover {
+            color: #fff;
+            background: #667eea;
+        }
+
+        .caret-icon {
+            width: 20px;
+            height: 20px;
+            display: block;
+            transition: transform 0.2s;
+        }
+
+        .caret-icon.expanded {
+            transform: rotate(90deg);
+        }
+
+        @media (max-width: 600px) {
+            .exercise-header {
+                gap: 4px;
+                margin-bottom: 10px;
+            }
+            .caret-btn {
+                min-width: 32px;
+                min-height: 32px;
+                padding: 4px 6px;
+            }
+            .exercise-name {
+                font-size: 16px;
             }
         }
     </style>
@@ -530,52 +887,76 @@
 
         <!-- Workout Tracking Page -->
         <div id="workout" class="page">
-            <div class="current-workout" id="currentWorkoutSection" style="display: none;">
-                <h3>Current Workout Session</h3>
-                <div class="workout-summary" id="workoutSummary"></div>
-                <button class="btn btn-danger" onclick="finishWorkout()">Finish Workout</button>
-            </div>
-
-            <div class="workout-form">
-                <h3>Start Your Workout</h3>
+            <div class="workout-form" id="startSessionSection">
+                <h3>Start New Workout Session</h3>
                 <div class="form-group">
-                    <label for="userName">Your Name:</label>
+                    <label for="userName">Select Client:</label>
                     <select id="userName" class="form-control">
+                        <option value="">Choose a client...</option>
                         <option value="Bryan">Bryan</option>
                         <option value="Riley">Riley</option>
                         <option value="Ques">Ques</option>
                         <option value="Ryan">Ryan</option>
                     </select>
                 </div>
-                
-                <div class="form-group">
-                    <label>Workout Focus:</label>
-                    <div class="focus-buttons" id="focusButtons">
-                        <button class="focus-btn" onclick="toggleFocus(this, 'Chest')">Chest</button>
-                        <button class="focus-btn" onclick="toggleFocus(this, 'Back')">Back</button>
-                        <button class="focus-btn" onclick="toggleFocus(this, 'Legs')">Legs</button>
-                        <button class="focus-btn" onclick="toggleFocus(this, 'Shoulders')">Shoulders</button>
-                        <button class="focus-btn" onclick="toggleFocus(this, 'Arms')">Arms</button>
-                        <button class="focus-btn" onclick="toggleFocus(this, 'Cardio')">Cardio</button>
-                        <button class="focus-btn" onclick="toggleFocus(this, 'Full Body')">Full Body</button>
-                    </div>
-                </div>
-
                 <button class="btn" onclick="startWorkout()">Start Workout</button>
             </div>
-
+            <div id="workoutSetupSection" style="display: none;">
+                <div class="workout-form">
+                    <h3>Workout Plan</h3>
+                    <div class="form-group">
+                        <label>Today's Focus:</label>
+                        <div class="focus-buttons" id="focusButtons">
+                            <button class="focus-btn" onclick="toggleFocus(this, 'Chest')">Chest</button>
+                            <button class="focus-btn" onclick="toggleFocus(this, 'Back')">Back</button>
+                            <button class="focus-btn" onclick="toggleFocus(this, 'Legs')">Legs</button>
+                            <button class="focus-btn" onclick="toggleFocus(this, 'Shoulders')">Shoulders</button>
+                            <button class="focus-btn" onclick="toggleFocus(this, 'Arms')">Arms</button>
+                            <button class="focus-btn" onclick="toggleFocus(this, 'Cardio')">Cardio</button>
+                            <button class="focus-btn" onclick="toggleFocus(this, 'Full Body')">Full Body</button>
+                        </div>
+                    </div>
+                    <div class="workout-summary" id="workoutSummary"></div>
+                    <button class="btn" onclick="proceedToExercises()">Continue to Exercises</button>
+                    <button class="btn btn-secondary" onclick="cancelWorkout()">Cancel</button>
+                </div>
+            </div>
             <div id="exerciseSection" style="display: none;">
                 <div class="workout-form">
-                    <h3>Add Exercise</h3>
+                    <h3>Track Exercises</h3>
+                    <div class="workout-summary" id="exerciseSummary"></div>
                     <div class="form-group">
-                        <label for="exerciseName">Exercise Name:</label>
-                        <input type="text" id="exerciseName" class="form-control" placeholder="e.g., Bench Press, Squats, Running">
+                        <label for="exerciseName">Add Exercise:</label>
+                        <form id="exerciseForm" class="exercise-input-group" onsubmit="handleAddExercise(event)">
+                            <input type="text" id="exerciseName" class="form-control" placeholder="e.g., Bench Press, Squats, Running" autocomplete="off">
+                            <button type="submit" class="btn">Add</button>
+                        </form>
                     </div>
-                    <button class="btn" onclick="addExercise()">Add Exercise</button>
                 </div>
-
                 <div class="workout-exercises" id="workoutExercises">
                     <!-- Exercises will be added here -->
+                </div>
+                <div class="workout-actions">
+                    <button class="btn btn-danger" onclick="finishWorkout()">Complete Workout</button>
+                    <button class="btn btn-secondary" onclick="cancelWorkout()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add this before the closing body tag -->
+    <div class="modal-overlay" id="workoutModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalDate"></h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="user-list" id="userList">
+                    <!-- User buttons will be added here -->
+                </div>
+                <div class="workout-details" id="workoutDetails">
+                    <!-- Workout details will be shown here -->
                 </div>
             </div>
         </div>
@@ -587,6 +968,7 @@
         let currentWorkout = null;
         let currentDate = new Date();
         let selectedFocuses = new Set();
+        let expandedExerciseIndex = null;
 
         // Calendar functionality
         function showCalendar() {
@@ -638,11 +1020,25 @@
             dayElement.className = 'calendar-day';
             if (otherMonth) dayElement.classList.add('other-month');
 
-            const dateStr = formatDate(currentDate.getFullYear(), currentDate.getMonth(), day);
+            let dateStr;
+            if (otherMonth) {
+                // If it's a day from the next month
+                if (day < 7) { // These are next month's days
+                    const nextMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, day);
+                    dateStr = formatDate(nextMonth.getFullYear(), nextMonth.getMonth(), nextMonth.getDate());
+                } else { // These are previous month's days
+                    const prevMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, day);
+                    dateStr = formatDate(prevMonth.getFullYear(), prevMonth.getMonth(), prevMonth.getDate());
+                }
+            } else {
+                dateStr = formatDate(currentDate.getFullYear(), currentDate.getMonth(), day);
+            }
             
             if (workouts[dateStr]) {
                 dayElement.classList.add('has-workout');
                 const workoutTags = new Set();
+                const userCount = Object.keys(workouts[dateStr]).length;
+                
                 Object.entries(workouts[dateStr]).forEach(([user, userWorkouts]) => {
                     userWorkouts.forEach(workout => {
                         workoutTags.add(workout.type);
@@ -650,6 +1046,7 @@
                 });
                 
                 dayElement.innerHTML = `
+                    <div class="user-count">👥<span>${userCount}</span></div>
                     <span>${day}</span>
                     <div class="workout-tags">
                         ${Array.from(workoutTags).map(type => 
@@ -676,21 +1073,42 @@
 
         function startWorkout() {
             const userName = document.getElementById('userName').value;
+            if (!userName) {
+                alert('Please select a client to start the workout');
+                return;
+            }
+            currentWorkout = {
+                user: userName,
+                focuses: [],
+                date: formatDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()),
+                exercises: []
+            };
+            document.getElementById('startSessionSection').style.display = 'none';
+            document.getElementById('workoutSetupSection').style.display = 'block';
+            document.getElementById('exerciseSection').style.display = 'none';
+            updateWorkoutSummary();
+        }
+
+        function proceedToExercises() {
             if (selectedFocuses.size === 0) {
                 alert('Please select at least one workout focus');
                 return;
             }
-            
-            currentWorkout = {
-                user: userName,
-                focuses: Array.from(selectedFocuses),
-                date: formatDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()),
-                exercises: []
-            };
-
-            document.getElementById('currentWorkoutSection').style.display = 'block';
+            currentWorkout.focuses = Array.from(selectedFocuses);
+            document.getElementById('workoutSetupSection').style.display = 'none';
             document.getElementById('exerciseSection').style.display = 'block';
-            updateWorkoutSummary();
+            updateExerciseSummary();
+        }
+
+        function updateExerciseSummary() {
+            if (!currentWorkout) return;
+
+            const summary = document.getElementById('exerciseSummary');
+            summary.innerHTML = `
+                <div class="summary-item">👤 Client: ${currentWorkout.user}</div>
+                <div class="summary-item">🎯 Focus: ${currentWorkout.focuses.join(', ')}</div>
+                <div class="summary-item">💪 Exercises: ${currentWorkout.exercises.length}</div>
+            `;
         }
 
         function updateWorkoutSummary() {
@@ -698,10 +1116,8 @@
 
             const summary = document.getElementById('workoutSummary');
             summary.innerHTML = `
-                <div class="summary-item">👤 ${currentWorkout.user}</div>
-                <div class="summary-item">🎯 ${currentWorkout.focuses.join(', ')}</div>
-                <div class="summary-item">📅 ${currentWorkout.date}</div>
-                <div class="summary-item">💪 ${currentWorkout.exercises.length} Exercises</div>
+                <div class="summary-item">👤 Client: ${currentWorkout.user}</div>
+                <div class="summary-item">📅 Date: ${currentWorkout.date}</div>
             `;
         }
 
@@ -761,15 +1177,15 @@
                 alert('Workout saved locally, but there was an error saving to the cloud.');
             });
 
-            // Reset form
+            // Reset form and flow
             currentWorkout = null;
             selectedFocuses.clear();
             document.querySelectorAll('.focus-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('currentWorkoutSection').style.display = 'none';
+            document.getElementById('startSessionSection').style.display = 'block';
+            document.getElementById('workoutSetupSection').style.display = 'none';
             document.getElementById('exerciseSection').style.display = 'none';
             document.getElementById('workoutExercises').innerHTML = '';
-            
-            showCalendar(); // Refresh calendar to show new workout
+            showCalendar();
         }
 
         function changeMonth(direction) {
@@ -782,44 +1198,114 @@
         }
 
         function showWorkoutDetails(dateStr) {
-            if (workouts[dateStr]) {
-                const workoutData = workouts[dateStr];
-                let details = `Workouts on ${dateStr}:\n\n`;
-                
-                Object.entries(workoutData).forEach(([user, userWorkouts]) => {
-                    details += `${user}:\n`;
-                    userWorkouts.forEach(workout => {
-                        details += `  • ${workout.focuses.join(', ')}\n`;
-                        workout.exercises.forEach(exercise => {
-                            details += `    - ${exercise.name}\n`;
-                            exercise.sets.forEach((set, index) => {
-                                if (set.weight || set.reps) {
-                                    details += `      Set ${index + 1}: ${set.weight}lbs × ${set.reps} reps\n`;
-                                }
-                            });
-                        });
-                    });
-                    details += '\n';
-                });
-                
-                alert(details);
-            } else {
+            if (!workouts[dateStr]) {
                 alert(`No workouts recorded for ${dateStr}`);
+                return;
             }
+
+            const modal = document.getElementById('workoutModal');
+            const modalDate = document.getElementById('modalDate');
+            const userList = document.getElementById('userList');
+            const workoutDetails = document.getElementById('workoutDetails');
+
+            // Format the date for display
+            const [year, month, day] = dateStr.split('-');
+            const date = new Date(year, month - 1, day);
+            modalDate.textContent = date.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+
+            // Clear previous content
+            userList.innerHTML = '';
+            workoutDetails.innerHTML = '';
+
+            // Add user buttons
+            Object.keys(workouts[dateStr]).forEach(user => {
+                const button = document.createElement('button');
+                button.className = 'user-button';
+                button.textContent = user;
+                button.onclick = () => showUserWorkouts(dateStr, user);
+                userList.appendChild(button);
+            });
+
+            // Show first user's workouts by default
+            const firstUser = Object.keys(workouts[dateStr])[0];
+            if (firstUser) {
+                showUserWorkouts(dateStr, firstUser);
+                userList.firstChild.classList.add('active');
+            }
+
+            modal.classList.add('active');
+        }
+
+        function showUserWorkouts(dateStr, user) {
+            const workoutDetails = document.getElementById('workoutDetails');
+            const userButtons = document.querySelectorAll('.user-button');
+            
+            // Update active button
+            userButtons.forEach(btn => {
+                btn.classList.toggle('active', btn.textContent === user);
+            });
+
+            // Clear previous content
+            workoutDetails.innerHTML = '';
+
+            // Show user's workouts
+            workouts[dateStr][user].forEach(workout => {
+                const workoutCard = document.createElement('div');
+                workoutCard.className = 'workout-card';
+                
+                workoutCard.innerHTML = `
+                    <div class="workout-focus">${workout.focuses.join(', ')}</div>
+                    <div class="exercise-list">
+                        ${workout.exercises.map(exercise => `
+                            <div class="exercise-item">
+                                <div class="exercise-name">${exercise.name}</div>
+                                <div class="set-list">
+                                    ${exercise.sets.map((set, index) => 
+                                        set.weight || set.reps ? 
+                                            `<div class="set-item">Set ${index + 1}: ${set.weight}lbs × ${set.reps} reps</div>` 
+                                            : ''
+                                    ).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                workoutDetails.appendChild(workoutCard);
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('workoutModal').classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('workoutModal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeModal();
+            }
+        });
+
+        function handleAddExercise(e) {
+            e.preventDefault();
+            addExercise();
         }
 
         function addExercise() {
             const exerciseName = document.getElementById('exerciseName').value.trim();
             if (!exerciseName) return;
-
             const exercise = {
                 name: exerciseName,
                 sets: [{ weight: '', reps: '' }]
             };
-
             currentWorkout.exercises.push(exercise);
             renderExercises();
-            updateWorkoutSummary();
+            updateExerciseSummary();
             document.getElementById('exerciseName').value = '';
         }
 
@@ -828,32 +1314,42 @@
             container.innerHTML = '';
 
             currentWorkout.exercises.forEach((exercise, exerciseIndex) => {
+                const isExpanded = expandedExerciseIndex === exerciseIndex;
                 const exerciseCard = document.createElement('div');
                 exerciseCard.className = 'exercise-card';
                 exerciseCard.innerHTML = `
                     <div class="exercise-header">
                         <div class="exercise-name">${exercise.name}</div>
-                        <div class="exercise-actions">
+                        <button class="caret-btn" onclick="toggleExerciseExpand(${exerciseIndex})" aria-label="Expand/collapse exercise">
+                            <svg class="caret-icon${isExpanded ? ' expanded' : ''}" viewBox="0 0 20 20" fill="currentColor"><polygon points="6,4 14,10 6,16"/></svg>
+                        </button>
+                        <div class="exercise-actions" style="${isExpanded ? '' : 'display:none;'}">
                             <button class="btn btn-danger" onclick="removeExercise(${exerciseIndex})">Remove</button>
                         </div>
                     </div>
-                    <table class="sets-table">
-                        <thead>
-                            <tr>
-                                <th>Set</th>
-                                <th>Weight (lbs)</th>
-                                <th>Reps</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="sets-${exerciseIndex}">
-                        </tbody>
-                    </table>
-                    <button class="btn add-set-btn" onclick="addSet(${exerciseIndex})">+ Add Set</button>
+                    <div class="exercise-details" style="${isExpanded ? '' : 'display:none;'}">
+                        <table class="sets-table">
+                            <thead>
+                                <tr>
+                                    <th>Set</th>
+                                    <th>Weight (lbs)</th>
+                                    <th>Reps</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sets-${exerciseIndex}"></tbody>
+                        </table>
+                        <button class="btn add-set-btn" onclick="addSet(${exerciseIndex})">+ Add Set</button>
+                    </div>
                 `;
                 container.appendChild(exerciseCard);
-                renderSets(exerciseIndex);
+                if (isExpanded) renderSets(exerciseIndex);
             });
+        }
+
+        function toggleExerciseExpand(index) {
+            expandedExerciseIndex = expandedExerciseIndex === index ? null : index;
+            renderExercises();
         }
 
         function renderSets(exerciseIndex) {
@@ -889,7 +1385,18 @@
         function removeExercise(exerciseIndex) {
             currentWorkout.exercises.splice(exerciseIndex, 1);
             renderExercises();
-            updateWorkoutSummary();
+            updateExerciseSummary();
+        }
+
+        function cancelWorkout() {
+            currentWorkout = null;
+            selectedFocuses.clear();
+            document.querySelectorAll('.focus-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('startSessionSection').style.display = 'block';
+            document.getElementById('workoutSetupSection').style.display = 'none';
+            document.getElementById('exerciseSection').style.display = 'none';
+            document.getElementById('workoutExercises').innerHTML = '';
+            document.getElementById('exerciseName').value = '';
         }
 
         // Page navigation
