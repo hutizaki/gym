@@ -365,10 +365,136 @@
             
             .calendar-grid {
                 font-size: 14px;
+                gap: 5px;
+            }
+
+            .calendar-day {
+                min-height: 80px;
+                padding: 2px;
+            }
+
+            .calendar-day-header {
+                padding: 5px;
+                font-size: 12px;
+            }
+
+            .workout-tag {
+                font-size: 8px;
+                padding: 1px 4px;
             }
             
             .workout-summary {
                 flex-direction: column;
+                gap: 10px;
+            }
+
+            .summary-item {
+                width: 100%;
+                text-align: center;
+            }
+
+            .focus-buttons {
+                gap: 5px;
+            }
+
+            .focus-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .exercise-card {
+                padding: 15px;
+            }
+
+            .sets-table {
+                font-size: 12px;
+            }
+
+            .sets-table th,
+            .sets-table td {
+                padding: 5px;
+            }
+
+            .sets-table input {
+                padding: 4px;
+                font-size: 12px;
+            }
+
+            .btn {
+                padding: 8px 16px;
+                font-size: 14px;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .exercise-actions .btn {
+                width: auto;
+                margin-bottom: 0;
+            }
+
+            .calendar-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .calendar-nav {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            .workout-form {
+                padding: 15px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-control {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar-day {
+                min-height: 60px;
+            }
+
+            .workout-tags {
+                display: none;
+            }
+
+            .calendar-day.has-workout::after {
+                content: '💪';
+                position: absolute;
+                top: 2px;
+                right: 2px;
+                font-size: 12px;
+            }
+
+            .exercise-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+
+            .exercise-actions {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .exercise-actions .btn {
+                width: 100%;
             }
         }
     </style>
@@ -632,7 +758,15 @@
                 Object.entries(workoutData).forEach(([user, userWorkouts]) => {
                     details += `${user}:\n`;
                     userWorkouts.forEach(workout => {
-                        details += `  • ${workout.focuses.join(', ')} (${workout.exercises.length} exercises)\n`;
+                        details += `  • ${workout.focuses.join(', ')}\n`;
+                        workout.exercises.forEach(exercise => {
+                            details += `    - ${exercise.name}\n`;
+                            exercise.sets.forEach((set, index) => {
+                                if (set.weight || set.reps) {
+                                    details += `      Set ${index + 1}: ${set.weight}lbs × ${set.reps} reps\n`;
+                                }
+                            });
+                        });
                     });
                     details += '\n';
                 });
