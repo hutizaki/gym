@@ -1,0 +1,9 @@
+/* /Layout/MainLayout.razor.rz.scp.css */
+.page[b-fk1s7mdlxn] {
+    display: flex;
+    flex-direction: column;
+}
+
+.header[b-fk1s7mdlxn] {
+    background-color: #9d54af;
+}

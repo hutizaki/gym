@@ -1,0 +1,43 @@
+@namespace gymtrack.Components
+@using System.Globalization
+@using gymtrack.Models
+@using gymtrack.Components
+
+<div class="month" data-month="@Month.Key">
+    <div class="month-header">@Month.Date.ToString("MMMM yyyy")</div>
+    
+    <div class="weekdays">
+        <div class="weekday">S</div>
+        <div class="weekday">M</div>
+        <div class="weekday">T</div>
+        <div class="weekday">W</div>
+        <div class="weekday">T</div>
+        <div class="weekday">F</div>
+        <div class="weekday">S</div>
+    </div>
+    
+    <div class="days-grid">
+        @foreach (var day in Month.Days)
+        {
+            <DayComponent Day="day" 
+                         Events="GetEventsForDay(day.Date)"
+                         OnClick="HandleDayClick" />
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public MonthData Month { get; set; } = null!;
+    [Parameter] public DateTime Today { get; set; }
+    [Parameter] public EventCallback<DateTime> OnDayClick { get; set; }
+    
+    private List<EventData> GetEventsForDay(DateTime date)
+    {
+        return Month.Events.TryGetValue(date, out var events) ? events : new List<EventData>();
+    }
+    
+    private async Task HandleDayClick(DateTime selectedDate)
+    {
+        await OnDayClick.InvokeAsync(selectedDate);
+    }
+} 

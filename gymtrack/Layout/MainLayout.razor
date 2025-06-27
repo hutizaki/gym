@@ -1,0 +1,65 @@
+﻿@inherits LayoutComponentBase
+@using gymtrack.Components
+@using gymtrack.Layout
+
+<div class="page">
+    <div class="header">
+        <h1>🏋Workout Tracker</h1>
+        <p>Track your workouts and see your progress</p>
+    </div>
+
+    <Navigation />
+
+    <div class="app-container">
+        <div class="header">
+            <h2>Gym Tracker Calendar</h2>
+            @if (SelectedDate.HasValue)
+            {
+                <p>Selected: @SelectedDate.Value.ToString("MMMM dd, yyyy")</p>
+            }
+        </div>
+        
+        <CalendarContainer OnDaySelected="HandleDaySelected" />
+        
+        @Body
+        
+        <div class="footer">
+            <button class="btn btn-primary" @onclick="AddWorkoutToday">
+                Add Workout for Today
+            </button>
+            
+            @if (SelectedDate.HasValue && SelectedDate.Value != DateTime.Today)
+            {
+                <button class="btn btn-secondary" @onclick="AddWorkoutToSelectedDate">
+                    Add Workout for @SelectedDate.Value.ToString("MM/dd")
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private DateTime? SelectedDate;
+    
+    private void HandleDaySelected(DateTime selectedDate)
+    {
+        SelectedDate = selectedDate;
+        StateHasChanged();
+    }
+    
+    private void AddWorkoutToday()
+    {
+        var today = DateTime.Today;
+        // Navigate to workout entry page or open modal
+        // NavigationManager.NavigateTo($"/workout/add?date={today:yyyy-MM-dd}");
+    }
+    
+    private void AddWorkoutToSelectedDate()
+    {
+        if (SelectedDate.HasValue)
+        {
+            // Navigate to workout entry page or open modal
+            // NavigationManager.NavigateTo($"/workout/add?date={SelectedDate.Value:yyyy-MM-dd}");
+        }
+    }
+}

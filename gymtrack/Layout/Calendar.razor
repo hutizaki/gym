@@ -1,0 +1,68 @@
+@using gymtrack.Services
+@inject IJSRuntime JS
+
+<div @ref="calendarDiv" class="calendar-container" @onscroll="OnScroll" style="max-height: 80vh; overflow-y: auto;">
+    <div class="months-wrapper">
+        @foreach (var (year, month) in months)
+        {
+            <MonthView Year="@year" Month="@month" />
+        }
+    </div>
+</div>
+
+@code {
+    private ElementReference calendarDiv;
+    private List<(int year, int month)> months = new();
+    private DateTime currentMonth = DateTime.Today;
+    private bool isLoading = false;
+    private DateTime? lastAddedMonth = null;
+
+    protected override void OnInitialized()
+    {
+        // Start with 6 months: 2 before, current, 3 after
+        for (int i = -2; i <= 3; i++)
+        {
+            var date = currentMonth.AddMonths(i);
+            months.Add((date.Year, date.Month));
+        }
+    }
+
+    private async Task OnScroll()
+    {
+        if (isLoading) return;
+        isLoading = true;
+
+        var scrollInfo = await JS.InvokeAsync<ScrollInfo>("getScrollInfo", calendarDiv);
+
+        // Only add one month per scroll event
+        if (scrollInfo.ScrollTop < 100)
+        {
+            var first = months.First();
+            var prev = new DateTime(first.year, first.month, 1).AddMonths(-1);
+            if (!months.Any(m => m.year == prev.Year && m.month == prev.Month) && lastAddedMonth != prev)
+            {
+                months.Insert(0, (prev.Year, prev.Month));
+                lastAddedMonth = prev;
+            }
+        }
+        else if (scrollInfo.ScrollHeight - scrollInfo.ClientHeight - scrollInfo.ScrollTop < 100)
+        {
+            var last = months.Last();
+            var next = new DateTime(last.year, last.month, 1).AddMonths(1);
+            if (!months.Any(m => m.year == next.Year && m.month == next.Month) && lastAddedMonth != next)
+            {
+                months.Add((next.Year, next.Month));
+                lastAddedMonth = next;
+            }
+        }
+
+        isLoading = false;
+    }
+
+    public class ScrollInfo
+    {
+        public double ScrollTop { get; set; }
+        public double ScrollHeight { get; set; }
+        public double ClientHeight { get; set; }
+    }
+}

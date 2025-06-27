@@ -1,0 +1,63 @@
+is_global = true
+build_property.EnableAotAnalyzer = 
+build_property.EnableSingleFileAnalyzer = 
+build_property.EnableTrimAnalyzer = false
+build_property.IncludeAllContentForSelfExtract = 
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = false
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = browser
+build_property.RootNamespace = gymtrack
+build_property.RootNamespace = gymtrack
+build_property.ProjectDir = /Users/bryan/git/github-pages/gymtrack.github.io/gymtrack/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = false
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = /Users/bryan/git/github-pages/gymtrack.github.io/gymtrack
+build_property._RazorSourceGeneratorDebug = 
+
+[/Users/bryan/git/github-pages/gymtrack.github.io/gymtrack/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/bryan/git/github-pages/gymtrack.github.io/gymtrack/Components/CalendarContainer.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9DYWxlbmRhckNvbnRhaW5lci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/bryan/git/github-pages/gymtrack.github.io/gymtrack/Components/DayComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9EYXlDb21wb25lbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/bryan/git/github-pages/gymtrack.github.io/gymtrack/Components/MonthComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Nb250aENvbXBvbmVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/bryan/git/github-pages/gymtrack.github.io/gymtrack/Layout/Calendar.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0L0NhbGVuZGFyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/bryan/git/github-pages/gymtrack.github.io/gymtrack/Layout/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0L01haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/bryan/git/github-pages/gymtrack.github.io/gymtrack/Layout/MonthView.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0L01vbnRoVmlldy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/bryan/git/github-pages/gymtrack.github.io/gymtrack/Layout/Navigation.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0L05hdmlnYXRpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/bryan/git/github-pages/gymtrack.github.io/gymtrack/Pages/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSG9tZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/bryan/git/github-pages/gymtrack.github.io/gymtrack/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 

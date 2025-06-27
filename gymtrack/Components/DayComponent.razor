@@ -1,0 +1,55 @@
+@namespace gymtrack.Components
+@using gymtrack.Models
+
+<div class="day @GetDayClasses()" @onclick="() => HandleClick()">
+    @Day.Date.Day
+    
+    @if (Events.Any())
+    {
+        <div class="event-indicators">
+            @foreach (var eventItem in Events.Take(4)) // Limit to 4 indicators
+            {
+                <div class="event-dot @GetEventClass(eventItem.Type)"></div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public DayData Day { get; set; } = null!;
+    [Parameter] public List<EventData> Events { get; set; } = new();
+    [Parameter] public EventCallback<DateTime> OnClick { get; set; }
+    
+    private string GetDayClasses()
+    {
+        var classes = new List<string>();
+        
+        if (!Day.IsCurrentMonth)
+            classes.Add("other-month");
+            
+        if (Day.IsToday)
+            classes.Add("today");
+            
+        if (Events.Any())
+            classes.Add("has-events");
+            
+        return string.Join(" ", classes);
+    }
+    
+    private string GetEventClass(EventType eventType)
+    {
+        return eventType switch
+        {
+            EventType.Workout => "workout",
+            EventType.Cardio => "cardio",
+            EventType.Rest => "rest",
+            EventType.Personal => "personal",
+            _ => ""
+        };
+    }
+    
+    private async Task HandleClick()
+    {
+        await OnClick.InvokeAsync(Day.Date);
+    }
+} 
