@@ -1,0 +1,57 @@
+/* Import component styles */
+@import './base.css';
+@import './header.css';
+@import './navigation.css';
+@import './workout.css';
+@import './calendar.css';
+@import './settings.css';
+@import './modal.css';
+@import './notification.css';
+
+/* Main App Layout */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.main-content {
+  flex: 1;
+  padding: 1rem;
+  padding-bottom: 5rem; /* Space for bottom nav */
+  overflow-y: auto;
+}
+
+/* Tab Content */
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 0.75rem;
+    padding-bottom: 5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 0.5rem;
+    padding-bottom: 5rem;
+  }
+}
