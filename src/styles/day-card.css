@@ -1,0 +1,168 @@
+/* Day Card */
+.day-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: var(--day-card-height);
+    width: var(--day-card-width);
+    border-radius: var(--day-card-border-radius);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+    padding: var(--spacing-xs);
+}
+
+.day-card.completed {
+    background: linear-gradient(135deg, #51cf66, #40c057);
+    border: 2px solid rgba(55, 156, 71, 0.8);
+    animation: completedGlow 0.6s ease-out;
+}
+
+.day-card.today {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    border-color: rgba(255, 255, 255, 0.5);
+    animation: todayPulse 2s ease-in-out infinite alternate;
+    position: relative;
+    overflow: hidden;
+}
+
+.day-card.today::before {
+    content: '';
+    position: absolute;
+    top: 25%;
+    left: -100%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg,
+        transparent 0%,
+        transparent 40%,
+        rgba(255,255,255,0.6) 50%,
+        transparent 60%,
+        transparent 100%);
+    animation: dayShimmer 2.5s ease-in-out infinite;
+    z-index: 1;
+}
+
+.day-card.missed {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    border: 2px solid rgba(52, 73, 94, 0.8);
+}
+
+.day-card.future {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+}
+
+.day-card:hover:not(.future) {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+@keyframes completedGlow {
+    0% { transform: scale(1); box-shadow: 0 0 0 rgba(81, 207, 102, 0.7); }
+    50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(81, 207, 102, 0.7); }
+    100% { transform: scale(1); box-shadow: 0 0 0 rgba(81, 207, 102, 0.7); }
+}
+
+@keyframes todayPulse {
+    0% { box-shadow: 0 0 8px rgba(79, 172, 254, 0.6); }
+    100% { box-shadow: 0 0 16px rgba(79, 172, 254, 0.9); }
+}
+
+@keyframes dayShimmer {
+    0% { transform: translate(0%, 0%); }
+    100% { transform: translate(75%, -75%); }
+}
+
+.day-date {
+    font-size: var(--font-size-small);
+    font-weight: 700;
+    opacity: 0.9;
+    position: relative;
+    z-index: 2;
+}
+
+.day-friends {
+    display: flex;
+    gap: 2px;
+    margin-top: auto;
+    position: relative;
+    z-index: 2;
+}
+
+.friend-avatar {
+    width: calc(var(--day-card-width) * 0.32);
+    height: calc(var(--day-card-width) * 0.32);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    font-size: calc(var(--day-card-width) * 0.16);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    transition: transform 0.2s ease;
+}
+
+.day-friends.overlapping .friend-avatar {
+    margin-left: calc(var(--day-card-width) * -0.2); /* Responsive overlap */
+    z-index: 1;
+}
+
+.day-friends.overlapping .friend-avatar:first-child {
+    margin-left: 0; /* First avatar doesn't need left margin */
+    z-index: 3;
+}
+
+.day-friends.overlapping .friend-avatar:nth-child(2) {
+    z-index: 2;
+}
+
+.day-friends.overlapping .friend-avatar:nth-child(3) {
+    z-index: 1;
+}
+
+/* Ellipsis span styling */
+.ellipsis {
+    font-size: 10px;
+    font-weight: 900;
+    color: white;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    width: calc(var(--day-card-width) * 0.32);
+    height: calc(var(--day-card-width) * 0.32);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: -10px;
+}
+
+.day-friends.overlapping .friend-avatar:hover {
+    transform: scale(1.1);
+    z-index: 1;
+}
+
+.avatar-1 { background: linear-gradient(135deg, #fa709a, #fee140); }
+.avatar-2 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+.avatar-3 { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+.avatar-4 { background: linear-gradient(135deg, #667eea, #764ba2); }
+
+.workout-icon {
+    font-size: calc(var(--day-card-width) * 0.4);
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    align-self: center;
+    margin: var(--spacing-xs) 0;
+    min-height: calc(var(--day-card-width) * 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+}
+
+.workout-icon img {
+    width: calc(var(--day-card-width) * 0.4);
+    height: calc(var(--day-card-width) * 0.4);
+    object-fit: contain;
+}
