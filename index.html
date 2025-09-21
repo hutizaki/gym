@@ -1,62 +1,34 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GymTrack - Workout Tracker</title>
-    <link rel="stylesheet" href="src/styles/main.css" />
-  </head>
-
-  <body>
-    <div class="app-container">
-      <!-- Header -->
-      <header class="app-header">
-        <h1>🏋️ GymTrack</h1>
-        <p>Track your workouts, sync with Google Sheets</p>
-      </header>
-
-      <!-- Main Content Area -->
-      <main class="main-content">
-        <!-- Workout Tab -->
-        <div id="workout-tab" class="tab-content active">
-          <div id="workout-content"></div>
-        </div>
-
-        <!-- Calendar Tab -->
-        <div id="calendar-tab" class="tab-content">
-          <div id="calendar-content"></div>
-        </div>
-
-        <!-- Settings Tab -->
-        <div id="settings-tab" class="tab-content">
-          <div id="settings-content"></div>
-        </div>
-      </main>
-
-      <!-- Bottom Navigation -->
-      <nav class="bottom-nav">
-        <button class="nav-item active" data-tab="workout">
-          <span class="nav-icon">🏋️</span>
-          <span class="nav-label">Workout</span>
-        </button>
-        <button class="nav-item" data-tab="calendar">
-          <span class="nav-icon">📅</span>
-          <span class="nav-label">History</span>
-        </button>
-        <button class="nav-item" data-tab="settings">
-          <span class="nav-icon">⚙️</span>
-          <span class="nav-label">Settings</span>
-        </button>
-      </nav>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitFlow - This Week</title>
+    <link rel="stylesheet" href="src/styles/base.css">
+    <link rel="stylesheet" href="src/styles/status-bar.css">
+    <link rel="stylesheet" href="src/styles/header.css">
+    <link rel="stylesheet" href="src/styles/streak-section.css">
+    <link rel="stylesheet" href="src/styles/days-grid.css">
+    <link rel="stylesheet" href="src/styles/friends-section.css">
+    <link rel="stylesheet" href="src/styles/challenge-banner.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Web Components with declarative syntax - data loaded from DataService -->
+        
+        <header-component></header-component>
+        
+        <streak-section></streak-section>
+        
+        <week-grid></week-grid>
+        
+        <friends-section></friends-section>
+        
+        <challenge-banner></challenge-banner>
+        
+        <div class="bottom-spacer"></div>
     </div>
-
-    <!-- Modals Container -->
-    <div id="modals-container"></div>
-
-    <!-- Notifications Container -->
-    <div id="notification" class="notification"></div>
-
-    <!-- Load Main App -->
+    
     <script type="module" src="src/main.js"></script>
-  </body>
+</body>
 </html>

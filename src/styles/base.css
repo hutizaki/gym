@@ -1,99 +1,94 @@
-/* Reset and Base Styles */
+/* Base styles */
+:root {
+    /* Responsive scaling variables */
+    --screen-width: 100vw;
+    --screen-height: 100vh;
+    
+    /* Day card responsive dimensions */
+    --day-card-width: clamp(45px, 12vw, 65px);
+    --day-card-height: clamp(75px, 20vw, 95px);
+    --day-card-gap: clamp(6px, 2vw, 12px);
+    --day-card-border-radius: clamp(12px, 3vw, 18px);
+    
+    /* Typography scaling */
+    --font-size-small: clamp(10px, 2.5vw, 12px);
+    --font-size-medium: clamp(12px, 3vw, 16px);
+    --font-size-large: clamp(16px, 4vw, 20px);
+    
+    /* Spacing variables */
+    --spacing-xs: clamp(4px, 1vw, 8px);
+    --spacing-sm: clamp(8px, 2vw, 12px);
+    --spacing-md: clamp(12px, 3vw, 20px);
+    --spacing-lg: clamp(20px, 5vw, 30px);
+    
+    /* Week section variables */
+    --week-section-width: 100vw;
+    --week-padding: clamp(10px, 3vw, 20px);
+}
+
+/* Media queries for different screen sizes */
+@media (max-width: 375px) {
+    /* iPhone SE, small phones */
+    :root {
+        --day-card-width: 10vw;
+        --day-card-height: 18vw;
+        --day-card-gap: 1.5vw;
+    }
+}
+
+@media (min-width: 376px) and (max-width: 414px) {
+    /* iPhone 12 mini, iPhone 13 mini */
+    :root {
+        --day-card-width: 11vw;
+        --day-card-height: 19vw;
+        --day-card-gap: 2vw;
+    }
+}
+
+@media (min-width: 415px) and (max-width: 428px) {
+    /* iPhone 12, iPhone 13, iPhone 14 */
+    :root {
+        --day-card-width: 12vw;
+        --day-card-height: 20vw;
+        --day-card-gap: 2vw;
+    }
+}
+
+@media (min-width: 429px) {
+    /* iPhone 12 Pro Max, iPhone 13 Pro Max, iPhone 14 Plus */
+    :root {
+        --day-card-width: 11vw;
+        --day-card-height: 18vw;
+        --day-card-gap: 2.5vw;
+    }
+}
+
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #333;
-  line-height: 1.6;
-  min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+    color: white;
+    overflow-x: hidden;
+    height: 100vh;
 }
 
-/* Buttons */
-.btn-primary, .btn-secondary, .btn-success, .btn-danger {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
+.container {
+    padding: 0;
+    max-width: 100vw;
+    margin: 0 auto;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow-x: visible;
+
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-secondary {
-  background: #6c757d;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background: #5a6268;
-  transform: translateY(-1px);
-}
-
-.btn-success {
-  background: #28a745;
-  color: white;
-}
-
-.btn-success:hover {
-  background: #218838;
-  transform: translateY(-1px);
-}
-
-.btn-danger {
-  background: #dc3545;
-  color: white;
-}
-
-.btn-danger:hover {
-  background: #c82333;
-  transform: translateY(-1px);
-}
-
-/* Form Elements */
-input[type="text"], 
-input[type="url"], 
-input[type="number"], 
-select {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #dee2e6;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-}
-
-input:focus, select:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: #495057;
+.bottom-spacer {
+    height: 100px;
 }
