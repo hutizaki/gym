@@ -13,25 +13,6 @@ const WeekGrid = ({ weeksData = [], weekData = [] }) => {
     return weeksData.length > 0 ? weeksData : [{ days: weekData, label: 'This Week' }];
   }, [weeksData, weekData]);
 
-  // Throttled scroll handler for better performance
-  const handleScroll = useCallback(() => {
-    if (!scrollRef.current) return;
-    
-    const containerWidth = scrollRef.current.offsetWidth;
-    const scrollLeft = scrollRef.current.scrollLeft;
-    
-    // Calculate which week is currently visible
-    const currentIndex = Math.round(scrollLeft / containerWidth);
-    
-    // Ensure index is within bounds
-    const boundedIndex = Math.max(0, Math.min(currentIndex, weeks.length - 1));
-    
-    setCurrentWeekIndex(boundedIndex);
-    
-    // Update current month - prioritize Today card, otherwise use first visible card
-    updateCurrentMonth(boundedIndex);
-  }, [weeks.length, updateCurrentMonth]);
-
   // Memoized helper function to update month based on visible week
   const updateCurrentMonth = useCallback((weekIndex) => {
     if (!weeks[weekIndex] || !weeks[weekIndex].days || weeks[weekIndex].days.length === 0) return;
@@ -60,6 +41,25 @@ const WeekGrid = ({ weeksData = [], weekData = [] }) => {
       }
     }
   }, [weeks]);
+
+  // Throttled scroll handler for better performance
+  const handleScroll = useCallback(() => {
+    if (!scrollRef.current) return;
+    
+    const containerWidth = scrollRef.current.offsetWidth;
+    const scrollLeft = scrollRef.current.scrollLeft;
+    
+    // Calculate which week is currently visible
+    const currentIndex = Math.round(scrollLeft / containerWidth);
+    
+    // Ensure index is within bounds
+    const boundedIndex = Math.max(0, Math.min(currentIndex, weeks.length - 1));
+    
+    setCurrentWeekIndex(boundedIndex);
+    
+    // Update current month - prioritize Today card, otherwise use first visible card
+    updateCurrentMonth(boundedIndex);
+  }, [weeks.length, updateCurrentMonth]);
 
   useEffect(() => {
     if (scrollRef.current && weeks.length > 0) {
