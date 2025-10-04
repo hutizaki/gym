@@ -30,11 +30,11 @@ const WeekGrid = ({ weeksData = [], weekData = [] }) => {
     
     setCurrentWeekIndex(boundedIndex);
     
-    // Update current month - prioritize Today card, otherwise use first visible card
-    updateCurrentMonth(boundedIndex);
+    // When user scrolls, always show month of first card in visible week
+    updateCurrentMonthFromScroll(boundedIndex);
   };
 
-  // Helper function to update month based on visible week
+  // Helper function to update month based on visible week (for initial load - prioritizes Today card)
   const updateCurrentMonth = (weekIndex) => {
     if (!weeks[weekIndex] || !weeks[weekIndex].days || weeks[weekIndex].days.length === 0) return;
     
@@ -59,6 +59,19 @@ const WeekGrid = ({ weeksData = [], weekData = [] }) => {
         const monthName = firstDay.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
         setCurrentMonth(monthName);
       }
+    }
+  };
+
+  // Helper function to update month when user scrolls (always uses first card)
+  const updateCurrentMonthFromScroll = (weekIndex) => {
+    if (!weeks[weekIndex] || !weeks[weekIndex].days || weeks[weekIndex].days.length === 0) return;
+    
+    const currentWeek = weeks[weekIndex];
+    const firstDay = currentWeek.days[0];
+    
+    if (firstDay && firstDay.fullDate) {
+      const monthName = firstDay.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      setCurrentMonth(monthName);
     }
   };
 
