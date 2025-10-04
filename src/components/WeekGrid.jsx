@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import DayCard from './DayCard';
-import PageScrollIndicator from './PageScrollIndicator';
 import '../styles/week-grid.css';
 
 const WeekGrid = ({ weeksData = [], weekData = [] }) => {
   const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const scrollRef = useRef(null);
-  const [currentWeekIndex, setCurrentWeekIndex] = useState(3); // Start at week 4 (index 3)
+  const [, setCurrentWeekIndex] = useState(3); // Start at week 4 (index 3)
   const [currentMonth, setCurrentMonth] = useState('');
 
   // Use weeksData if provided, otherwise fall back to single week for backward compatibility
@@ -31,7 +30,7 @@ const WeekGrid = ({ weeksData = [], weekData = [] }) => {
     
     // Update current month - prioritize Today card, otherwise use first visible card
     updateCurrentMonth(boundedIndex);
-  }, [weeks.length]);
+  }, [weeks.length, updateCurrentMonth]);
 
   // Memoized helper function to update month based on visible week
   const updateCurrentMonth = useCallback((weekIndex) => {
