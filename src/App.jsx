@@ -3,7 +3,7 @@ import './styles/base.css';
 import StatusBar from './components/StatusBar';
 import Header from './components/Header';
 import StreakSection from './components/StreakSection';
-import WeekGrid from './components/WeekGrid';
+import HorizontalDayScroll from './components/HorizontalDayScroll';
 import FriendsSection from './components/FriendsSection';
 import ChallengeBanner from './components/ChallengeBanner';
 import VersionTracker from './components/VersionTracker';
@@ -54,7 +54,7 @@ function App() {
         <StatusBar />
         <Header {...headerData} />
         <StreakSection {...streakData} />
-        <WeekGrid weeksData={weeksData} />
+        <HorizontalDayScroll weeksData={weeksData} />
         <FriendsSection friendsData={friendsData} />
         <ChallengeBanner {...challengeData} />
         <div className="bottom-spacer"></div>
