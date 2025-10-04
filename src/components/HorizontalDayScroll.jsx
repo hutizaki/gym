@@ -30,37 +30,53 @@ const HorizontalDayScroll = ({ weeksData = [], weekData = [] }) => {
     return days;
   }, [weeks, dayNames]);
 
-  // Memoized helper function to update month based on visible day
-  const updateCurrentMonth = useCallback(() => {
-    if (allDays.length === 0) return;
+  // Create a month tracking system
+  const monthData = useMemo(() => {
+    if (allDays.length === 0) return { months: [], monthRanges: {} };
     
-    const today = new Date();
-    const todayString = today.toDateString();
+    const months = [];
+    const monthRanges = {};
+    let currentMonth = null;
+    let monthStartIndex = 0;
     
-    // First, try to find a "today" card
-    const todayCard = allDays.find(day => 
-      day.status === 'today' && 
-      day.fullDate && 
-      day.fullDate.toDateString() === todayString
-    );
-    
-    if (todayCard && todayCard.fullDate) {
-      // Use the month from the today card
-      const monthName = todayCard.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      setCurrentMonth(monthName);
-    } else {
-      // Fallback to the first day
-      const firstDay = allDays[0];
-      if (firstDay && firstDay.fullDate) {
-        const monthName = firstDay.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-        setCurrentMonth(monthName);
+    allDays.forEach((day, index) => {
+      if (day.fullDate) {
+        const dayMonth = day.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        
+        if (currentMonth !== dayMonth) {
+          // New month detected
+          if (currentMonth !== null) {
+            // Save the previous month's range
+            monthRanges[currentMonth] = {
+              start: monthStartIndex,
+              end: index - 1,
+              count: index - monthStartIndex
+            };
+          }
+          
+          // Start tracking new month
+          currentMonth = dayMonth;
+          monthStartIndex = index;
+          months.push(dayMonth);
+        }
       }
+    });
+    
+    // Handle the last month
+    if (currentMonth !== null) {
+      monthRanges[currentMonth] = {
+        start: monthStartIndex,
+        end: allDays.length - 1,
+        count: allDays.length - monthStartIndex
+      };
     }
+    
+    return { months, monthRanges };
   }, [allDays]);
 
-  // Handle scroll events to update current month
-  const handleScroll = useCallback(() => {
-    if (!scrollContainerRef.current) return;
+  // Memoized helper function to update month based on visible day
+  const updateCurrentMonth = useCallback(() => {
+    if (allDays.length === 0 || !scrollContainerRef.current) return;
     
     const containerWidth = scrollContainerRef.current.offsetWidth;
     const scrollLeft = scrollContainerRef.current.scrollLeft;
@@ -72,12 +88,18 @@ const HorizontalDayScroll = ({ weeksData = [], weekData = [] }) => {
     // Ensure index is within bounds
     const boundedIndex = Math.max(0, Math.min(currentDayIndex, allDays.length - 1));
     
-    // Update month based on the visible day
-    if (allDays[boundedIndex] && allDays[boundedIndex].fullDate) {
-      const monthName = allDays[boundedIndex].fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    // Find which month this day belongs to
+    const visibleDay = allDays[boundedIndex];
+    if (visibleDay && visibleDay.fullDate) {
+      const monthName = visibleDay.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
       setCurrentMonth(monthName);
     }
   }, [allDays]);
+
+  // Handle scroll events to update current month
+  const handleScroll = useCallback(() => {
+    updateCurrentMonth();
+  }, [updateCurrentMonth]);
 
   // Initialize scroll position and set up event listeners
   useEffect(() => {
@@ -129,10 +151,38 @@ const HorizontalDayScroll = ({ weeksData = [], weekData = [] }) => {
     }
   }, [completeWorkout, makeUpWorkout]);
 
+  // Function to scroll to a specific month
+  const scrollToMonth = useCallback((monthName) => {
+    if (!scrollContainerRef.current || !monthData.monthRanges[monthName]) return;
+    
+    const monthRange = monthData.monthRanges[monthName];
+    const dayWidth = 80; // Approximate width of each day card
+    const scrollPosition = monthRange.start * dayWidth;
+    
+    scrollContainerRef.current.scrollTo({
+      left: scrollPosition,
+      behavior: 'smooth'
+    });
+  }, [monthData.monthRanges]);
+
   return (
     <div className="horizontal-day-scroll-container">
       <div className="month-header">
         <h3 className="month-label">{currentMonth}</h3>
+        {monthData.months.length > 1 && (
+          <div className="month-navigation">
+            {monthData.months.map((month) => (
+              <button
+                key={month}
+                className={`month-nav-btn ${month === currentMonth ? 'active' : ''}`}
+                onClick={() => scrollToMonth(month)}
+                title={`Go to ${month}`}
+              >
+                {month.split(' ')[0]} {/* Show only month name, not year */}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       
       <div className="horizontal-scroll-wrapper" ref={scrollContainerRef}>

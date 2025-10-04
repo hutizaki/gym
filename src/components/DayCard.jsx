@@ -4,7 +4,7 @@ import dumbbellIcon from '../assets/Dumbbell_Weights.png';
 
 const DayCard = ({ day, date, status, workout, friends, onClick }) => {
   return (
-    <div className="day-card-container">
+    <div className="day-card-container d-flex-column">
       <div className="day-of-week">
         <span>{day}</span>
       </div>
