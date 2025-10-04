@@ -2,13 +2,13 @@ import React from 'react';
 import '../styles/day-card.css';
 import dumbbellIcon from '../assets/Dumbbell_Weights.png';
 
-const DayCard = ({ day, date, status, workout, friends, onClick }) => {
+const DayCard = ({ day, date, status, workout, friends, dayOfMonth, onClick }) => {
   return (
     <div className="day-card-container d-flex-column">
       <div className="day-of-week">
         <span>{day}</span>
       </div>
-        <div className={`day-card ${status || ''}`} onClick={onClick}>
+        <div className={`day-card ${status || ''}`} data-day-of-month={dayOfMonth || ''} onClick={onClick}>
           {date && <div className="day-date">{date}</div>}
           {status === 'completed' && <div className="workout-icon">
             {workout ? workout : <img src={dumbbellIcon} alt="dumbbell"/>}

@@ -5,6 +5,7 @@
   "homepage": "https://hutizaki.github.io/gym",
   "dependencies": {
     "bootstrap": "^5.3.8",
+    "motion": "^12.23.22",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scroll": "^1.9.3",

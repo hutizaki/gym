@@ -1,11 +1,12 @@
-import React, { useEffect, useRef, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useMemo, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import DayCard from './DayCard';
 import '../styles/horizontal-day-scroll.css';
 
-const HorizontalDayScroll = ({ weeksData = [], weekData = [] }) => {
+const HorizontalDayScroll = forwardRef(({ weeksData = [], weekData = [] }, ref) => {
   const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const [currentMonth, setCurrentMonth] = useState('');
-  const scrollContainerRef = useRef(null);
+  const [todayCardPosition, setTodayCardPosition] = useState(null);
+  const containerRef = useRef(null);
 
   // Use weeksData if provided, otherwise fall back to single week for backward compatibility
   const weeks = useMemo(() => {
@@ -17,25 +18,45 @@ const HorizontalDayScroll = ({ weeksData = [], weekData = [] }) => {
     const days = [];
     weeks.forEach((week, weekIndex) => {
       week.days.forEach((day, dayIndex) => {
+        // Determine day-of-month attribute
+        let dayOfMonth = null;
+        if (day.fullDate) {
+          const dayNumber = day.fullDate.getDate();
+          const currentMonth = day.fullDate.getMonth();
+          const currentYear = day.fullDate.getFullYear();
+          
+          // Check if this is the first day of the month
+          if (dayNumber === 1) {
+            dayOfMonth = 'first';
+          } else {
+            // Check if this is the last day of the month
+            const nextDay = new Date(currentYear, currentMonth + 1, 0);
+            if (dayNumber === nextDay.getDate()) {
+              dayOfMonth = 'end';
+            }
+          }
+        }
+        
         days.push({
           ...day,
           weekIndex,
           dayIndex,
           actualDayName: day.fullDate 
             ? day.fullDate.toLocaleDateString('en-US', { weekday: 'short' })
-            : dayNames[dayIndex]
+            : dayNames[dayIndex],
+          dayOfMonth
         });
       });
     });
     return days;
   }, [weeks, dayNames]);
 
-  // Create a month tracking system
+  // Create month tracking data
   const monthData = useMemo(() => {
-    if (allDays.length === 0) return { months: [], monthRanges: {} };
+    if (allDays.length === 0) return { monthRanges: {}, months: [] };
     
-    const months = [];
     const monthRanges = {};
+    const months = [];
     let currentMonth = null;
     let monthStartIndex = 0;
     
@@ -71,63 +92,50 @@ const HorizontalDayScroll = ({ weeksData = [], weekData = [] }) => {
       };
     }
     
-    return { months, monthRanges };
+    return { monthRanges, months };
   }, [allDays]);
 
-  // Memoized helper function to update month based on visible day
+  // Safely find and track the today card position
+  const findTodayCardPosition = useCallback(() => {
+    if (allDays.length === 0) return null;
+    
+    const todayIndex = allDays.findIndex(day => day.status === 'today');
+    if (todayIndex !== -1) {
+      return {
+        index: todayIndex,
+        weekIndex: allDays[todayIndex].weekIndex,
+        dayIndex: allDays[todayIndex].dayIndex,
+        day: allDays[todayIndex]
+      };
+    }
+    return null;
+  }, [allDays.length]); // Only depend on length, not the entire array
+
+  // Update month label based on first day with date
   const updateCurrentMonth = useCallback(() => {
-    if (allDays.length === 0 || !scrollContainerRef.current) return;
+    if (allDays.length === 0) return;
     
-    const containerWidth = scrollContainerRef.current.offsetWidth;
-    const scrollLeft = scrollContainerRef.current.scrollLeft;
-    
-    // Calculate which day is currently visible (assuming each day takes ~80px width)
-    const dayWidth = 80; // Approximate width of each day card
-    const currentDayIndex = Math.round(scrollLeft / dayWidth);
-    
-    // Ensure index is within bounds
-    const boundedIndex = Math.max(0, Math.min(currentDayIndex, allDays.length - 1));
-    
-    // Find which month this day belongs to
-    const visibleDay = allDays[boundedIndex];
-    if (visibleDay && visibleDay.fullDate) {
-      const monthName = visibleDay.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    // Find first day with a date to show month
+    const dayWithDate = allDays.find(day => day.fullDate);
+    if (dayWithDate?.fullDate) {
+      const monthName = dayWithDate.fullDate.toLocaleDateString('en-US', { 
+        month: 'long', 
+        year: 'numeric' 
+      });
       setCurrentMonth(monthName);
     }
   }, [allDays]);
 
-  // Handle scroll events to update current month
-  const handleScroll = useCallback(() => {
-    updateCurrentMonth();
-  }, [updateCurrentMonth]);
-
-  // Initialize scroll position and set up event listeners
+  // Update today card position when data changes
   useEffect(() => {
-    if (scrollContainerRef.current && allDays.length > 0) {
-      // Throttled scroll handler for better performance
-      let scrollTimeout;
-      const throttledScrollHandler = () => {
-        if (scrollTimeout) return;
-        scrollTimeout = setTimeout(() => {
-          handleScroll();
-          scrollTimeout = null;
-        }, 16); // ~60fps throttling
-      };
-      
-      const scrollContainer = scrollContainerRef.current;
-      scrollContainer.addEventListener('scroll', throttledScrollHandler);
-      
-      // Set initial month
-      updateCurrentMonth();
-      
-      return () => {
-        clearTimeout(scrollTimeout);
-        if (scrollContainer) {
-          scrollContainer.removeEventListener('scroll', throttledScrollHandler);
-        }
-      };
-    }
-  }, [allDays, handleScroll, updateCurrentMonth]);
+    const todayPosition = findTodayCardPosition();
+    setTodayCardPosition(todayPosition);
+  }, [allDays.length, findTodayCardPosition]);
+
+  // Initialize month display
+  useEffect(() => {
+    updateCurrentMonth();
+  }, [allDays.length, updateCurrentMonth]);
 
   const completeWorkout = useCallback((weekIndex, dayIndex) => {
     // Trigger streak update event
@@ -151,41 +159,39 @@ const HorizontalDayScroll = ({ weeksData = [], weekData = [] }) => {
     }
   }, [completeWorkout, makeUpWorkout]);
 
-  // Function to scroll to a specific month
-  const scrollToMonth = useCallback((monthName) => {
-    if (!scrollContainerRef.current || !monthData.monthRanges[monthName]) return;
-    
-    const monthRange = monthData.monthRanges[monthName];
-    const dayWidth = 80; // Approximate width of each day card
-    const scrollPosition = monthRange.start * dayWidth;
-    
-    scrollContainerRef.current.scrollTo({
-      left: scrollPosition,
-      behavior: 'smooth'
-    });
-  }, [monthData.monthRanges]);
+  // Safe method to get today card position
+  const getTodayCardPosition = useCallback(() => {
+    return todayCardPosition;
+  }, [todayCardPosition]);
+
+  // Safe method to check if today card exists
+  const hasTodayCard = useCallback(() => {
+    return todayCardPosition !== null;
+  }, [todayCardPosition]);
+
+  // Expose methods through ref
+  useImperativeHandle(ref, () => ({
+    getTodayCardPosition,
+    hasTodayCard,
+    findTodayCardPosition,
+    updateCurrentMonth
+  }), [getTodayCardPosition, hasTodayCard, findTodayCardPosition, updateCurrentMonth]);
 
   return (
     <div className="horizontal-day-scroll-container">
       <div className="month-header">
         <h3 className="month-label">{currentMonth}</h3>
-        {monthData.months.length > 1 && (
-          <div className="month-navigation">
-            {monthData.months.map((month) => (
-              <button
-                key={month}
-                className={`month-nav-btn ${month === currentMonth ? 'active' : ''}`}
-                onClick={() => scrollToMonth(month)}
-                title={`Go to ${month}`}
-              >
-                {month.split(' ')[0]} {/* Show only month name, not year */}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
       
-      <div className="horizontal-scroll-wrapper" ref={scrollContainerRef}>
+      <div 
+        className="horizontal-scroll-wrapper" 
+        ref={containerRef}
+        style={{ 
+          overflow: 'auto',
+          scrollbarWidth: 'none', /* Firefox */
+          msOverflowStyle: 'none'  /* IE and Edge */
+        }}
+      >
         <div className="horizontal-days-container">
           {allDays.map((day, index) => (
             <DayCard
@@ -195,6 +201,7 @@ const HorizontalDayScroll = ({ weeksData = [], weekData = [] }) => {
               status={day.status}
               workout={day.workout}
               friends={day.friends}
+              dayOfMonth={day.dayOfMonth}
               onClick={() => handleDayClick(day)}
             />
           ))}
@@ -202,6 +209,6 @@ const HorizontalDayScroll = ({ weeksData = [], weekData = [] }) => {
       </div>
     </div>
   );
-};
+});
 
 export default HorizontalDayScroll;
