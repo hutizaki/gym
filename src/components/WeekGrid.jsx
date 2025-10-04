@@ -1,18 +1,41 @@
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo, useState } from 'react';
 import DayCard from './DayCard';
+import PageScrollIndicator from './PageScrollIndicator';
 import '../styles/week-grid.css';
 
 const WeekGrid = ({ weeksData = [], weekData = [] }) => {
   const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const scrollRef = useRef(null);
+  const [currentWeekIndex, setCurrentWeekIndex] = useState(3); // Start at week 4 (index 3)
 
   // Use weeksData if provided, otherwise fall back to single week for backward compatibility
   const weeks = useMemo(() => {
     return weeksData.length > 0 ? weeksData : [{ days: weekData, label: 'This Week' }];
   }, [weeksData, weekData]);
 
+  // Track scroll position to determine current week
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    
+    const containerWidth = scrollRef.current.offsetWidth;
+    const scrollLeft = scrollRef.current.scrollLeft;
+    
+    // Calculate which week is currently visible
+    // Add half container width to snap to the center of each week
+    const currentIndex = Math.round(scrollLeft / containerWidth);
+    
+    // Ensure index is within bounds
+    const boundedIndex = Math.max(0, Math.min(currentIndex, weeks.length - 1));
+    
+    setCurrentWeekIndex(boundedIndex);
+  };
+
   useEffect(() => {
     if (scrollRef.current && weeks.length > 0) {
+      // Add scroll event listener
+      const scrollContainer = scrollRef.current;
+      scrollContainer.addEventListener('scroll', handleScroll);
+      
       // Use setTimeout to ensure layout is complete
       const timer = setTimeout(() => {
         if (!scrollRef.current) return;
@@ -31,10 +54,18 @@ const WeekGrid = ({ weeksData = [], weekData = [] }) => {
             left: scrollPosition,
             behavior: 'instant'
           });
+          
+          // Update current week index after initial scroll
+          setCurrentWeekIndex(targetWeekIndex);
         }
       }, 100);
       
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        if (scrollContainer) {
+          scrollContainer.removeEventListener('scroll', handleScroll);
+        }
+      };
     }
   }, [weeks]);
 
@@ -70,21 +101,31 @@ const WeekGrid = ({ weeksData = [], weekData = [] }) => {
             </div>
             <div className="days-grid">
               <div className="days-row">
-                {week.days.map((day, dayIndex) => (
-                  <DayCard
-                    key={`${weekIndex}-${dayIndex}`}
-                    day={dayNames[dayIndex]}
-                    date={day.date}
-                    status={day.status}
-                    workout={day.workout}
-                    friends={day.friends}
-                    onClick={() => handleDayClick(day, weekIndex, dayIndex)}
-                  />
-                ))}
+                {week.days.map((day, dayIndex) => {
+                  // Get actual day name from the date
+                  const actualDayName = day.fullDate ? day.fullDate.toLocaleDateString('en-US', { weekday: 'short' }) : dayNames[dayIndex];
+                  
+                  return (
+                    <DayCard
+                      key={`${weekIndex}-${dayIndex}`}
+                      day={actualDayName}
+                      date={day.date}
+                      status={day.status}
+                      workout={day.workout}
+                      friends={day.friends}
+                      onClick={() => handleDayClick(day, weekIndex, dayIndex)}
+                    />
+                  );
+                })}
               </div>
             </div>
           </div>
         ))}
+      </div>
+      <div className="d-flex justify-content-center mb-2">
+        <PageScrollIndicator numberOfPages={weeks.length} 
+                            currentPage={currentWeekIndex}
+        />
       </div>
     </div>
   );
