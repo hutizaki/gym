@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo, useState } from 'react';
+import React, { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import DayCard from './DayCard';
 import PageScrollIndicator from './PageScrollIndicator';
 import '../styles/week-grid.css';
@@ -8,22 +8,20 @@ const WeekGrid = ({ weeksData = [], weekData = [] }) => {
   const scrollRef = useRef(null);
   const [currentWeekIndex, setCurrentWeekIndex] = useState(3); // Start at week 4 (index 3)
   const [currentMonth, setCurrentMonth] = useState('');
-  const [visitedWeeks, setVisitedWeeks] = useState(new Set([3])); // Start with week 4 visited
 
   // Use weeksData if provided, otherwise fall back to single week for backward compatibility
   const weeks = useMemo(() => {
     return weeksData.length > 0 ? weeksData : [{ days: weekData, label: 'This Week' }];
   }, [weeksData, weekData]);
 
-  // Track scroll position and mark weeks as visited
-  const handleScroll = () => {
+  // Throttled scroll handler for better performance
+  const handleScroll = useCallback(() => {
     if (!scrollRef.current) return;
     
     const containerWidth = scrollRef.current.offsetWidth;
     const scrollLeft = scrollRef.current.scrollLeft;
     
     // Calculate which week is currently visible
-    // Add half container width to snap to the center of each week
     const currentIndex = Math.round(scrollLeft / containerWidth);
     
     // Ensure index is within bounds
@@ -31,53 +29,53 @@ const WeekGrid = ({ weeksData = [], weekData = [] }) => {
     
     setCurrentWeekIndex(boundedIndex);
     
-    // Mark all weeks up to the current one as visited
-    const newVisitedWeeks = new Set();
-    for (let i = 0; i <= boundedIndex; i++) {
-      newVisitedWeeks.add(i);
-    }
-    setVisitedWeeks(newVisitedWeeks);
-  };
+    // Update current month - prioritize Today card, otherwise use first visible card
+    updateCurrentMonth(boundedIndex);
+  }, [weeks.length]);
 
-  // Helper function to update month based on visited weeks
-  const updateMonthFromVisitedWeeks = (visitedWeeksSet) => {
-    if (visitedWeeksSet.size === 0) return;
+  // Memoized helper function to update month based on visible week
+  const updateCurrentMonth = useCallback((weekIndex) => {
+    if (!weeks[weekIndex] || !weeks[weekIndex].days || weeks[weekIndex].days.length === 0) return;
     
-    // Find the most recent visited week (highest index)
-    const visitedArray = Array.from(visitedWeeksSet).sort((a, b) => b - a);
-    const mostRecentWeekIndex = visitedArray[0];
+    const currentWeek = weeks[weekIndex];
+    const today = new Date();
+    const todayString = today.toDateString();
     
-    if (weeks[mostRecentWeekIndex] && weeks[mostRecentWeekIndex].days && weeks[mostRecentWeekIndex].days.length > 0) {
-      const currentWeek = weeks[mostRecentWeekIndex];
-      const today = new Date();
-      
-      // First, try to find a "today" card in the most recent visited week
-      const todayCard = currentWeek.days.find(day => 
-        day.status === 'today' && 
-        day.fullDate && 
-        day.fullDate.toDateString() === today.toDateString()
-      );
-      
-      if (todayCard && todayCard.fullDate) {
-        // Use the month from the today card
-        const monthName = todayCard.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    // First, try to find a "today" card in the current week
+    const todayCard = currentWeek.days.find(day => 
+      day.status === 'today' && 
+      day.fullDate && 
+      day.fullDate.toDateString() === todayString
+    );
+    
+    if (todayCard && todayCard.fullDate) {
+      // Use the month from the today card
+      const monthName = todayCard.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      setCurrentMonth(monthName);
+    } else {
+      // Fallback to the first day of the visible week
+      const firstDay = currentWeek.days[0];
+      if (firstDay && firstDay.fullDate) {
+        const monthName = firstDay.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
         setCurrentMonth(monthName);
-      } else {
-        // Fallback to the first day of the most recent visited week
-        const firstDay = currentWeek.days[0];
-        if (firstDay && firstDay.fullDate) {
-          const monthName = firstDay.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-          setCurrentMonth(monthName);
-        }
       }
     }
-  };
+  }, [weeks]);
 
   useEffect(() => {
     if (scrollRef.current && weeks.length > 0) {
-      // Add scroll event listener
+      // Throttled scroll handler for better performance
+      let scrollTimeout;
+      const throttledScrollHandler = () => {
+        if (scrollTimeout) return;
+        scrollTimeout = setTimeout(() => {
+          handleScroll();
+          scrollTimeout = null;
+        }, 16); // ~60fps throttling
+      };
+      
       const scrollContainer = scrollRef.current;
-      scrollContainer.addEventListener('scroll', handleScroll);
+      scrollContainer.addEventListener('scroll', throttledScrollHandler);
       
       // Use setTimeout to ensure layout is complete
       const timer = setTimeout(() => {
@@ -101,46 +99,42 @@ const WeekGrid = ({ weeksData = [], weekData = [] }) => {
           // Update current week index after initial scroll
           setCurrentWeekIndex(targetWeekIndex);
           
-          // Set initial month based on visited weeks
-          updateMonthFromVisitedWeeks(new Set([targetWeekIndex]));
+          // Set initial month using the helper function
+          updateCurrentMonth(targetWeekIndex);
         }
       }, 100);
       
       return () => {
         clearTimeout(timer);
+        clearTimeout(scrollTimeout);
         if (scrollContainer) {
-          scrollContainer.removeEventListener('scroll', handleScroll);
+          scrollContainer.removeEventListener('scroll', throttledScrollHandler);
         }
       };
     }
-  }, [weeks]);
+  }, [weeks, handleScroll, updateCurrentMonth]);
 
-  // Update month when visited weeks change
-  useEffect(() => {
-    updateMonthFromVisitedWeeks(visitedWeeks);
-  }, [visitedWeeks, weeks]);
+  const completeWorkout = useCallback((weekIndex, dayIndex) => {
+    // Trigger streak update event
+    document.dispatchEvent(new CustomEvent('workoutCompleted', { 
+      detail: { weekIndex, dayIndex } 
+    }));
+  }, []);
 
-  const handleDayClick = (day, weekIndex, dayIndex) => {
+  const makeUpWorkout = useCallback((weekIndex, dayIndex) => {
+    // Trigger streak update event
+    document.dispatchEvent(new CustomEvent('workoutCompleted', { 
+      detail: { weekIndex, dayIndex } 
+    }));
+  }, []);
+
+  const handleDayClick = useCallback((day, weekIndex, dayIndex) => {
     if (day.status === 'today') {
       completeWorkout(weekIndex, dayIndex);
     } else if (day.status === 'missed') {
       makeUpWorkout(weekIndex, dayIndex);
     }
-  };
-
-  const completeWorkout = (weekIndex, dayIndex) => {
-    // Trigger streak update event
-    document.dispatchEvent(new CustomEvent('workoutCompleted', { 
-      detail: { weekIndex, dayIndex } 
-    }));
-  };
-
-  const makeUpWorkout = (weekIndex, dayIndex) => {
-    // Trigger streak update event
-    document.dispatchEvent(new CustomEvent('workoutCompleted', { 
-      detail: { weekIndex, dayIndex } 
-    }));
-  };
+  }, [completeWorkout, makeUpWorkout]);
 
   return (
     <div className="weeks-container">
@@ -153,8 +147,10 @@ const WeekGrid = ({ weeksData = [], weekData = [] }) => {
             <div className="days-grid">
               <div className="days-row">
                 {week.days.map((day, dayIndex) => {
-                  // Get actual day name from the date
-                  const actualDayName = day.fullDate ? day.fullDate.toLocaleDateString('en-US', { weekday: 'short' }) : dayNames[dayIndex];
+                  // Memoize day name calculation for better performance
+                  const actualDayName = useMemo(() => {
+                    return day.fullDate ? day.fullDate.toLocaleDateString('en-US', { weekday: 'short' }) : dayNames[dayIndex];
+                  }, [day.fullDate, dayIndex]);
                   
                   return (
                     <DayCard
