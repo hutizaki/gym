@@ -1,12 +1,10 @@
 import React, { useEffect, useRef, useMemo, useState, useCallback } from 'react';
-import { Element, scroller } from 'react-scroll';
 import DayCard from './DayCard';
 import '../styles/horizontal-day-scroll.css';
 
 const HorizontalDayScroll = ({ weeksData = [], weekData = [] }) => {
   const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const [currentMonth, setCurrentMonth] = useState('');
-  const [currentWeekIndex, setCurrentWeekIndex] = useState(3); // Start at week 4 (index 3)
   const scrollContainerRef = useRef(null);
 
   // Use weeksData if provided, otherwise fall back to single week for backward compatibility
@@ -32,16 +30,15 @@ const HorizontalDayScroll = ({ weeksData = [], weekData = [] }) => {
     return days;
   }, [weeks, dayNames]);
 
-  // Memoized helper function to update month based on visible week
-  const updateCurrentMonth = useCallback((weekIndex) => {
-    if (!weeks[weekIndex] || !weeks[weekIndex].days || weeks[weekIndex].days.length === 0) return;
+  // Memoized helper function to update month based on visible day
+  const updateCurrentMonth = useCallback(() => {
+    if (allDays.length === 0) return;
     
-    const currentWeek = weeks[weekIndex];
     const today = new Date();
     const todayString = today.toDateString();
     
-    // First, try to find a "today" card in the current week
-    const todayCard = currentWeek.days.find(day => 
+    // First, try to find a "today" card
+    const todayCard = allDays.find(day => 
       day.status === 'today' && 
       day.fullDate && 
       day.fullDate.toDateString() === todayString
@@ -52,35 +49,39 @@ const HorizontalDayScroll = ({ weeksData = [], weekData = [] }) => {
       const monthName = todayCard.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
       setCurrentMonth(monthName);
     } else {
-      // Fallback to the first day of the visible week
-      const firstDay = currentWeek.days[0];
+      // Fallback to the first day
+      const firstDay = allDays[0];
       if (firstDay && firstDay.fullDate) {
         const monthName = firstDay.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
         setCurrentMonth(monthName);
       }
     }
-  }, [weeks]);
+  }, [allDays]);
 
-  // Handle scroll events to update current week and month
+  // Handle scroll events to update current month
   const handleScroll = useCallback(() => {
     if (!scrollContainerRef.current) return;
     
     const containerWidth = scrollContainerRef.current.offsetWidth;
     const scrollLeft = scrollContainerRef.current.scrollLeft;
     
-    // Calculate which week is currently visible
-    const currentIndex = Math.round(scrollLeft / containerWidth);
+    // Calculate which day is currently visible (assuming each day takes ~80px width)
+    const dayWidth = 80; // Approximate width of each day card
+    const currentDayIndex = Math.round(scrollLeft / dayWidth);
     
     // Ensure index is within bounds
-    const boundedIndex = Math.max(0, Math.min(currentIndex, weeks.length - 1));
+    const boundedIndex = Math.max(0, Math.min(currentDayIndex, allDays.length - 1));
     
-    setCurrentWeekIndex(boundedIndex);
-    updateCurrentMonth(boundedIndex);
-  }, [weeks.length, updateCurrentMonth]);
+    // Update month based on the visible day
+    if (allDays[boundedIndex] && allDays[boundedIndex].fullDate) {
+      const monthName = allDays[boundedIndex].fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      setCurrentMonth(monthName);
+    }
+  }, [allDays]);
 
   // Initialize scroll position and set up event listeners
   useEffect(() => {
-    if (scrollContainerRef.current && weeks.length > 0) {
+    if (scrollContainerRef.current && allDays.length > 0) {
       // Throttled scroll handler for better performance
       let scrollTimeout;
       const throttledScrollHandler = () => {
@@ -94,42 +95,17 @@ const HorizontalDayScroll = ({ weeksData = [], weekData = [] }) => {
       const scrollContainer = scrollContainerRef.current;
       scrollContainer.addEventListener('scroll', throttledScrollHandler);
       
-      // Use setTimeout to ensure layout is complete
-      const timer = setTimeout(() => {
-        if (!scrollContainerRef.current) return;
-        
-        // Snap to week 4 (index 3) in the array - this is now the current week
-        const targetWeekIndex = 3;
-        
-        if (weeks.length > targetWeekIndex) {
-          const containerWidth = scrollContainerRef.current.offsetWidth;
-          
-          // Calculate scroll position to show week 4
-          // Each week takes full container width, so multiply by index
-          const scrollPosition = targetWeekIndex * containerWidth;
-          
-          scrollContainerRef.current.scrollTo({
-            left: scrollPosition,
-            behavior: 'instant'
-          });
-          
-          // Update current week index after initial scroll
-          setCurrentWeekIndex(targetWeekIndex);
-          
-          // Set initial month using the helper function
-          updateCurrentMonth(targetWeekIndex);
-        }
-      }, 100);
+      // Set initial month
+      updateCurrentMonth();
       
       return () => {
-        clearTimeout(timer);
         clearTimeout(scrollTimeout);
         if (scrollContainer) {
           scrollContainer.removeEventListener('scroll', throttledScrollHandler);
         }
       };
     }
-  }, [weeks, handleScroll, updateCurrentMonth]);
+  }, [allDays, handleScroll, updateCurrentMonth]);
 
   const completeWorkout = useCallback((weekIndex, dayIndex) => {
     // Trigger streak update event
@@ -153,18 +129,6 @@ const HorizontalDayScroll = ({ weeksData = [], weekData = [] }) => {
     }
   }, [completeWorkout, makeUpWorkout]);
 
-  // Group days by week for rendering
-  const daysByWeek = useMemo(() => {
-    const grouped = {};
-    allDays.forEach(day => {
-      if (!grouped[day.weekIndex]) {
-        grouped[day.weekIndex] = [];
-      }
-      grouped[day.weekIndex].push(day);
-    });
-    return grouped;
-  }, [allDays]);
-
   return (
     <div className="horizontal-day-scroll-container">
       <div className="month-header">
@@ -173,48 +137,18 @@ const HorizontalDayScroll = ({ weeksData = [], weekData = [] }) => {
       
       <div className="horizontal-scroll-wrapper" ref={scrollContainerRef}>
         <div className="horizontal-days-container">
-          {Object.keys(daysByWeek).map(weekIndex => (
-            <Element 
-              key={weekIndex} 
-              name={`week-${weekIndex}`}
-              className="week-section"
-            >
-              <div className="days-grid">
-                <div className="days-row">
-                  {daysByWeek[weekIndex].map((day, dayIndex) => (
-                    <DayCard
-                      key={`${day.weekIndex}-${day.dayIndex}`}
-                      day={day.actualDayName}
-                      date={day.date}
-                      status={day.status}
-                      workout={day.workout}
-                      friends={day.friends}
-                      onClick={() => handleDayClick(day)}
-                    />
-                  ))}
-                </div>
-              </div>
-            </Element>
+          {allDays.map((day, index) => (
+            <DayCard
+              key={`${day.weekIndex}-${day.dayIndex}`}
+              day={day.actualDayName}
+              date={day.date}
+              status={day.status}
+              workout={day.workout}
+              friends={day.friends}
+              onClick={() => handleDayClick(day)}
+            />
           ))}
         </div>
-      </div>
-      
-      {/* Week navigation dots */}
-      <div className="week-navigation">
-        {weeks.map((_, index) => (
-          <button
-            key={index}
-            className={`week-dot ${index === currentWeekIndex ? 'active' : ''}`}
-            onClick={() => {
-              scroller.scrollTo(`week-${index}`, {
-                containerId: 'horizontal-scroll-wrapper',
-                duration: 300,
-                smooth: true,
-                horizontal: true
-              });
-            }}
-          />
-        ))}
       </div>
     </div>
   );
