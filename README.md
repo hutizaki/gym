@@ -1,6 +1,6 @@
 # FitFlow - Gym Tracking App
 
-A React-based gym tracking application built with Tauri for cross-platform desktop support.
+A React-based gym tracking application with a modern web interface and backend API.
 
 ## Features
 
@@ -12,8 +12,8 @@ A React-based gym tracking application built with Tauri for cross-platform deskt
 
 ## Tech Stack
 
-- **Frontend**: React 18
-- **Desktop**: Tauri (Rust + Web)
+- **Frontend**: React 18 + Vite
+- **Backend**: Node.js + Express
 - **Styling**: CSS3 with modern features
 - **State Management**: React Hooks
 
@@ -22,7 +22,6 @@ A React-based gym tracking application built with Tauri for cross-platform deskt
 ### Prerequisites
 
 - Node.js (v16 or higher)
-- Rust (for Tauri)
 - npm or yarn
 
 ### Installation
@@ -33,15 +32,12 @@ A React-based gym tracking application built with Tauri for cross-platform deskt
    npm install
    ```
 
-3. Run the development server:
+3. Run the full-stack development environment:
    ```bash
-   npm start
+   ./start-fullstack.sh
    ```
 
-4. Run with Tauri (desktop app):
-   ```bash
-   npm run tauri dev
-   ```
+   This will start both the frontend (http://localhost:3000) and backend (http://localhost:8000) servers.
 
 ### Building for Production
 
@@ -49,8 +45,8 @@ A React-based gym tracking application built with Tauri for cross-platform deskt
 # Build React app
 npm run build
 
-# Build Tauri app
-npm run tauri build
+# Deploy to GitHub Pages
+npm run deploy
 ```
 
 ## Project Structure
@@ -89,7 +85,7 @@ Promotional banner for weekly challenges.
 
 ## Development
 
-The app uses React with functional components and hooks for state management. All styling is done with CSS3, and the app is designed to work both as a web app and desktop app via Tauri.
+The app uses React with functional components and hooks for state management. All styling is done with CSS3, and the app is designed as a modern web application with a Node.js backend API.
 
 ## License
 

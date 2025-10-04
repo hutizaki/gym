@@ -31,8 +31,8 @@ cd ..
 # Wait a moment for backend to start
 sleep 3
 
-echo "⚛️  Starting React frontend..."
-npm start &
+echo "⚛️  Starting Vite frontend..."
+npm run dev &
 FRONTEND_PID=$!
 
 echo ""

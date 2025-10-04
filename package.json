@@ -15,7 +15,6 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "tauri": "tauri",
     "predeploy": "npm run build",
     "deploy": "./deploy-safe-v2.sh",
     "analyze": "npm run build && npx vite-bundle-analyzer build"

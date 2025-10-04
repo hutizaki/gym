@@ -4,7 +4,7 @@ import '../styles/version-tracker.css';
 const VersionTracker = () => {
   return (
     <div className="version-tracker">
-      v.0.0
+      v.0.1
     </div>
   );
 };
