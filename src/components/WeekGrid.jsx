@@ -8,13 +8,14 @@ const WeekGrid = ({ weeksData = [], weekData = [] }) => {
   const scrollRef = useRef(null);
   const [currentWeekIndex, setCurrentWeekIndex] = useState(3); // Start at week 4 (index 3)
   const [currentMonth, setCurrentMonth] = useState('');
+  const [visitedWeeks, setVisitedWeeks] = useState(new Set([3])); // Start with week 4 visited
 
   // Use weeksData if provided, otherwise fall back to single week for backward compatibility
   const weeks = useMemo(() => {
     return weeksData.length > 0 ? weeksData : [{ days: weekData, label: 'This Week' }];
   }, [weeksData, weekData]);
 
-  // Track scroll position to determine current week and month
+  // Track scroll position and mark weeks as visited
   const handleScroll = () => {
     if (!scrollRef.current) return;
     
@@ -30,48 +31,45 @@ const WeekGrid = ({ weeksData = [], weekData = [] }) => {
     
     setCurrentWeekIndex(boundedIndex);
     
-    // When user scrolls, always show month of first card in visible week
-    updateCurrentMonthFromScroll(boundedIndex);
-  };
-
-  // Helper function to update month based on visible week (for initial load - prioritizes Today card)
-  const updateCurrentMonth = (weekIndex) => {
-    if (!weeks[weekIndex] || !weeks[weekIndex].days || weeks[weekIndex].days.length === 0) return;
-    
-    const currentWeek = weeks[weekIndex];
-    const today = new Date();
-    
-    // First, try to find a "today" card in the current week
-    const todayCard = currentWeek.days.find(day => 
-      day.status === 'today' && 
-      day.fullDate && 
-      day.fullDate.toDateString() === today.toDateString()
-    );
-    
-    if (todayCard && todayCard.fullDate) {
-      // Use the month from the today card
-      const monthName = todayCard.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      setCurrentMonth(monthName);
-    } else {
-      // Fallback to the first day of the visible week
-      const firstDay = currentWeek.days[0];
-      if (firstDay && firstDay.fullDate) {
-        const monthName = firstDay.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-        setCurrentMonth(monthName);
-      }
+    // Mark all weeks up to the current one as visited
+    const newVisitedWeeks = new Set();
+    for (let i = 0; i <= boundedIndex; i++) {
+      newVisitedWeeks.add(i);
     }
+    setVisitedWeeks(newVisitedWeeks);
   };
 
-  // Helper function to update month when user scrolls (always uses first card)
-  const updateCurrentMonthFromScroll = (weekIndex) => {
-    if (!weeks[weekIndex] || !weeks[weekIndex].days || weeks[weekIndex].days.length === 0) return;
+  // Helper function to update month based on visited weeks
+  const updateMonthFromVisitedWeeks = (visitedWeeksSet) => {
+    if (visitedWeeksSet.size === 0) return;
     
-    const currentWeek = weeks[weekIndex];
-    const firstDay = currentWeek.days[0];
+    // Find the most recent visited week (highest index)
+    const visitedArray = Array.from(visitedWeeksSet).sort((a, b) => b - a);
+    const mostRecentWeekIndex = visitedArray[0];
     
-    if (firstDay && firstDay.fullDate) {
-      const monthName = firstDay.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      setCurrentMonth(monthName);
+    if (weeks[mostRecentWeekIndex] && weeks[mostRecentWeekIndex].days && weeks[mostRecentWeekIndex].days.length > 0) {
+      const currentWeek = weeks[mostRecentWeekIndex];
+      const today = new Date();
+      
+      // First, try to find a "today" card in the most recent visited week
+      const todayCard = currentWeek.days.find(day => 
+        day.status === 'today' && 
+        day.fullDate && 
+        day.fullDate.toDateString() === today.toDateString()
+      );
+      
+      if (todayCard && todayCard.fullDate) {
+        // Use the month from the today card
+        const monthName = todayCard.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        setCurrentMonth(monthName);
+      } else {
+        // Fallback to the first day of the most recent visited week
+        const firstDay = currentWeek.days[0];
+        if (firstDay && firstDay.fullDate) {
+          const monthName = firstDay.fullDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+          setCurrentMonth(monthName);
+        }
+      }
     }
   };
 
@@ -103,8 +101,8 @@ const WeekGrid = ({ weeksData = [], weekData = [] }) => {
           // Update current week index after initial scroll
           setCurrentWeekIndex(targetWeekIndex);
           
-          // Set initial month using the helper function
-          updateCurrentMonth(targetWeekIndex);
+          // Set initial month based on visited weeks
+          updateMonthFromVisitedWeeks(new Set([targetWeekIndex]));
         }
       }, 100);
       
@@ -117,15 +115,10 @@ const WeekGrid = ({ weeksData = [], weekData = [] }) => {
     }
   }, [weeks]);
 
-  // Update month when weeks data changes
+  // Update month when visited weeks change
   useEffect(() => {
-    if (weeks.length > 0) {
-      const targetWeekIndex = 3; // Start at week 4 (index 3)
-      if (weeks[targetWeekIndex]) {
-        updateCurrentMonth(targetWeekIndex);
-      }
-    }
-  }, [weeks]);
+    updateMonthFromVisitedWeeks(visitedWeeks);
+  }, [visitedWeeks, weeks]);
 
   const handleDayClick = (day, weekIndex, dayIndex) => {
     if (day.status === 'today') {
