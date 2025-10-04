@@ -1,0 +1,20 @@
+{
+  "name": "FitFlow - Gym Tracker",
+  "short_name": "FitFlow",
+  "description": "Your personal gym tracking app",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["fitness", "health", "lifestyle"],
+  "lang": "en",
+  "dir": "ltr"
+}
