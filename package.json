@@ -4,26 +4,21 @@
   "private": true,
   "homepage": "https://hutizaki.github.io/gym",
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.3.0",
-    "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.3.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "start:optimized": "REACT_APP_OPTIMIZED=true react-scripts start",
-    "build": "react-scripts build",
-    "build:optimized": "REACT_APP_OPTIMIZED=true react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
     "tauri": "tauri",
-    "predeploy": "npm run build:optimized",
+    "predeploy": "npm run build",
     "deploy": "./deploy-safe-v2.sh",
-    "analyze": "npm run build:optimized && npx webpack-bundle-analyzer build/static/js/*.js"
+    "analyze": "npm run build && npx vite-bundle-analyzer build"
   },
   "eslintConfig": {
     "extends": [
@@ -44,6 +39,15 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^6.3.0"
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@vitejs/plugin-react": "^5.0.4",
+    "gh-pages": "^6.3.0",
+    "jsdom": "^27.0.0",
+    "vite": "^7.1.9",
+    "vite-plugin-pwa": "^1.0.3",
+    "vitest": "^3.2.4",
+    "workbox-window": "^7.3.0"
   }
 }

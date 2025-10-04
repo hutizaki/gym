@@ -4,14 +4,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 
 // Use optimized version if environment variable is set
-const App = process.env.REACT_APP_OPTIMIZED === 'true' 
-  ? require('./AppOptimized').default 
-  : require('./App').default;
+import App from './App.jsx';
+import AppOptimized from './AppOptimized.jsx';
+
+const AppComponent = import.meta.env.VITE_OPTIMIZED === 'true' ? AppOptimized : App;
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <AppComponent />
   </React.StrictMode>
 );
 
