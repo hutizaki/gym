@@ -6,6 +6,7 @@ import StreakSection from './components/StreakSection';
 import WeekGrid from './components/WeekGrid';
 import FriendsSection from './components/FriendsSection';
 import ChallengeBanner from './components/ChallengeBanner';
+import VersionTracker from './components/VersionTracker';
 import { DataService } from './services/DataService';
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
         <FriendsSection friendsData={friendsData} />
         <ChallengeBanner {...challengeData} />
         <div className="bottom-spacer"></div>
+        <VersionTracker />
       </div>
     </div>
   );

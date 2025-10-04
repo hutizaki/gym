@@ -20,7 +20,7 @@
     "eject": "react-scripts eject",
     "tauri": "tauri",
     "predeploy": "npm run build",
-    "deploy": "./deploy.sh"
+    "deploy": "./deploy-safe-v2.sh"
   },
   "eslintConfig": {
     "extends": [
