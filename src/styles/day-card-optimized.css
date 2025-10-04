@@ -1,0 +1,136 @@
+/* Optimized Day Card - Reduced complexity for better performance */
+.day-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: var(--day-card-height);
+    width: var(--day-card-width);
+    border-radius: var(--day-card-border-radius);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 2px solid transparent;
+    padding: var(--spacing-xs);
+    will-change: transform;
+}
+
+/* Simplified states - removed complex animations */
+.day-card.completed {
+    background: #51cf66;
+    border-color: #379c47;
+}
+
+.day-card.today {
+    background: #4facfe;
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 8px rgba(79, 172, 254, 0.6);
+}
+
+.day-card.missed {
+    background: #2c3e50;
+    border-color: #34495e;
+    opacity: 0.7;
+}
+
+.day-card.future {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+}
+
+/* Optimized hover - only transform, no complex effects */
+.day-card:hover:not(.future) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Simplified content styling */
+.day-date {
+    font-size: var(--font-size-small);
+    font-weight: 700;
+    opacity: 0.9;
+    position: relative;
+    z-index: 2;
+}
+
+.day-friends {
+    display: flex;
+    gap: 2px;
+    margin-top: auto;
+    position: relative;
+    z-index: 2;
+}
+
+.friend-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--day-card-width) * 0.32);
+    height: calc(var(--day-card-width) * 0.32);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    font-size: calc(var(--day-card-width) * 0.16);
+    font-weight: 700;
+    transition: transform 0.2s ease;
+}
+
+.day-friends.overlapping .friend-avatar {
+    margin-left: calc(var(--day-card-width) * -0.2);
+    z-index: 1;
+}
+
+.day-friends.overlapping .friend-avatar:first-child {
+    margin-left: 0;
+    z-index: 3;
+}
+
+.day-friends.overlapping .friend-avatar:nth-child(2) {
+    z-index: 2;
+}
+
+.day-friends.overlapping .friend-avatar:nth-child(3) {
+    z-index: 1;
+}
+
+.ellipsis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--day-card-width) * 0.32);
+    height: calc(var(--day-card-width) * 0.32);
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    color: white;
+    font-size: 10px;
+    font-weight: 900;
+    margin-left: -10px;
+}
+
+.day-friends.overlapping .friend-avatar:hover {
+    transform: scale(1.1);
+    z-index: 1;
+}
+
+/* Simplified avatar gradients */
+.avatar-1 { background: linear-gradient(135deg, #fa709a, #fee140); }
+.avatar-2 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+.avatar-3 { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+.avatar-4 { background: linear-gradient(135deg, #667eea, #764ba2); }
+
+.workout-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--day-card-width) * 0.4);
+    margin: var(--spacing-xs) 0;
+    min-height: calc(var(--day-card-width) * 0.4);
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.workout-icon img {
+    width: calc(var(--day-card-width) * 0.4);
+    height: calc(var(--day-card-width) * 0.4);
+    object-fit: contain;
+}

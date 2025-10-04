@@ -2,7 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
-import App from './App';
+
+// Use optimized version if environment variable is set
+const App = process.env.REACT_APP_OPTIMIZED === 'true' 
+  ? require('./AppOptimized').default 
+  : require('./App').default;
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

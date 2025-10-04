@@ -15,12 +15,15 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:optimized": "REACT_APP_OPTIMIZED=true react-scripts start",
     "build": "react-scripts build",
+    "build:optimized": "REACT_APP_OPTIMIZED=true react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "tauri": "tauri",
-    "predeploy": "npm run build",
-    "deploy": "./deploy-safe-v2.sh"
+    "predeploy": "npm run build:optimized",
+    "deploy": "./deploy-safe-v2.sh",
+    "analyze": "npm run build:optimized && npx webpack-bundle-analyzer build/static/js/*.js"
   },
   "eslintConfig": {
     "extends": [
