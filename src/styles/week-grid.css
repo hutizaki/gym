@@ -1,5 +1,20 @@
 /* Weeks Container */
 
+.month-header {
+    margin-bottom: var(--spacing-md);
+    text-align: left;
+    padding-left: var(--week-padding);
+}
+
+.month-label {
+    font-size: var(--font-size-large);
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
 .weeks-scroll {
     display: flex;
     overflow-x: auto;
@@ -12,45 +27,59 @@
     display: none; /* Chrome, Safari, Opera */
 }
 
-.day-card-container {
+.week-section {
     flex: 0 0 auto;
     scroll-snap-align: start;
-    width: 100%;
+    width: var(--week-section-width);
     padding: 0 var(--week-padding);
+}
+
+.week-section:first-child {
+    padding-left: var(--week-padding);
+}
+
+.week-section:last-child {
+    padding-right: var(--week-padding);
+}
+
+.week-header {
+    margin-bottom: var(--spacing-md);
+    text-align: center;
+}
+
+.week-label {
+    font-size: var(--font-size-medium);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Days Grid */
+.days-grid {
+    padding: 0;
+}
+
+.day-card-container {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.day-card-container:first-child {
-    padding-left: var(--week-padding);
-}
-
-.day-card-container:last-child {
-    padding-right: var(--week-padding);
-}
-
-.day-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-bottom: var(--spacing-sm);
-    padding: 0 var(--spacing-sm);
-}
-
-.day-label {
+.day-of-week {
     font-size: var(--font-size-small);
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.9);
+    opacity: 0.6;
     text-transform: uppercase;
     letter-spacing: 1px;
+    margin-bottom: var(--spacing-sm);
 }
 
-.week-label {
-    font-size: var(--font-size-small);
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.6);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.days-row {
+    display: flex;
+    gap: var(--day-card-gap);
+    margin-bottom: var(--spacing-md);
+    justify-content: space-between;
+    width: 100%;
 }
