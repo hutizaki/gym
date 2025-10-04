@@ -6,7 +6,7 @@ import { DataService } from './services/DataService';
 const StatusBar = lazy(() => import('./components/StatusBar'));
 const Header = lazy(() => import('./components/Header'));
 const StreakSection = lazy(() => import('./components/StreakSection'));
-const WeekGridOptimized = lazy(() => import('./components/WeekGridOptimized'));
+const WeekGrid = lazy(() => import('./components/WeekGrid'));
 const FriendsSection = lazy(() => import('./components/FriendsSection'));
 const ChallengeBanner = lazy(() => import('./components/ChallengeBanner'));
 const VersionTracker = lazy(() => import('./components/VersionTracker'));
@@ -122,7 +122,7 @@ function AppOptimized() {
         </Suspense>
         
         <Suspense fallback={<div style={{ height: '200px' }} />}>
-          <WeekGridOptimized weeksData={weeksData} />
+          <WeekGrid weeksData={weeksData} />
         </Suspense>
         
         <Suspense fallback={<div style={{ height: '150px', margin: '0 10px' }} />}>
