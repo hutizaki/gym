@@ -113,6 +113,11 @@ fi
 
 echo "✅ Main branch integrity verified!"
 
+echo "📦 Reinstalling dependencies..."
+npm i
+
+echo "✅ Dependencies reinstalled!"
+
 echo ""
 echo "🎉 ULTRA-SAFE Deployment complete!"
 echo "   📊 Your app should be available at: https://hutizaki.github.io/gym/"
