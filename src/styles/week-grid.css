@@ -1,20 +1,5 @@
 /* Weeks Container */
 
-.month-header {
-    margin-bottom: var(--spacing-md);
-    text-align: left;
-    padding-left: var(--week-padding);
-}
-
-.month-label {
-    font-size: var(--font-size-large);
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.9);
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
 .weeks-scroll {
     display: flex;
     overflow-x: auto;
