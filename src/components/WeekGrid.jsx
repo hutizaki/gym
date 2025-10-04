@@ -147,10 +147,8 @@ const WeekGrid = ({ weeksData = [], weekData = [] }) => {
             <div className="days-grid">
               <div className="days-row">
                 {week.days.map((day, dayIndex) => {
-                  // Memoize day name calculation for better performance
-                  const actualDayName = useMemo(() => {
-                    return day.fullDate ? day.fullDate.toLocaleDateString('en-US', { weekday: 'short' }) : dayNames[dayIndex];
-                  }, [day.fullDate, dayIndex]);
+                  // Calculate day name directly (moved outside of useMemo to fix hook rules)
+                  const actualDayName = day.fullDate ? day.fullDate.toLocaleDateString('en-US', { weekday: 'short' }) : dayNames[dayIndex];
                   
                   return (
                     <DayCard
