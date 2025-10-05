@@ -45,9 +45,21 @@ A React-based gym tracking application with a modern web interface and backend A
 # Build React app
 npm run build
 
-# Deploy to GitHub Pages
-npm run deploy
+# Preview the build locally
+npm run preview
 ```
+
+### Deployment
+
+**Automatic Deployment (Recommended):**
+- Deployment happens automatically via GitHub Actions when you push to the `main` branch
+- No manual steps required - just push your code!
+
+
+**GitHub Actions Setup:**
+- Ensure GitHub Pages is configured to use "GitHub Actions" as the source in your repository settings
+- The deployment workflow runs automatically on every push to `main`
+- CI workflow runs on pushes to `main`/`develop` and all pull requests
 
 ## Project Structure
 

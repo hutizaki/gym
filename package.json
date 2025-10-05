@@ -17,9 +17,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "predeploy": "npm run build",
-    "deploy": "./deploy-safe-v2.sh",
-    "analyze": "npm run build && npx vite-bundle-analyzer build"
+    "deploy": "echo '🚀 Deployment now happens automatically via GitHub Actions on push to main branch'",
+    "analyze": "npm run build && npx vite-bundle-analyzer build",
+    "fullstack": "./start-fullstack.sh"
   },
   "eslintConfig": {
     "extends": [
@@ -44,7 +44,6 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@vitejs/plugin-react": "^5.0.4",
-    "gh-pages": "^6.3.0",
     "jsdom": "^27.0.0",
     "vite": "^7.1.9",
     "vite-plugin-pwa": "^1.0.3",
